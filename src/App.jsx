@@ -48,6 +48,15 @@ function App() {
   }
 
   useEffect(() => {
+    // Check if we're on a secure context for geolocation
+    if (window.isSecureContext) {
+      console.log("Running in a secure context - geolocation should work");
+    } else {
+      console.log("Not running in a secure context - geolocation may not work");
+      setError("Warning: This app is not running in a secure context (HTTPS). " +
+               "Geolocation may not work in some browsers. " +
+               "Try accessing via localhost or an HTTPS connection.");
+    }
     // You can uncomment this if you want to get location on page load
     // getLocation()
   }, [])
