@@ -27,8 +27,22 @@ function App() {
         setLoading(false)
       },
       (error) => {
-        setError(`Error: ${error.message}`)
-        setLoading(false)
+        let errorMessage = `Error: ${error.message}`;
+        
+        // Add helpful message for common permission errors
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMessage += "\n\nThis may be because:";
+          errorMessage += "\n1. You denied permission";
+          errorMessage += "\n2. You're not using HTTPS (required for geolocation except on localhost)";
+          errorMessage += "\n3. Your browser's privacy settings are blocking geolocation";
+          
+          if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+            errorMessage += "\n\nTry accessing this site via HTTPS instead.";
+          }
+        }
+        
+        setError(errorMessage);
+        setLoading(false);
       }
     )
   }
@@ -64,7 +78,11 @@ function App() {
           {loading ? 'Getting location...' : 'Get My Location'}
         </button>
         
-        {error && <p className="error">{error}</p>}
+        {error && (
+          <div className="error" style={{ whiteSpace: 'pre-line', color: 'red', margin: '10px 0' }}>
+            {error}
+          </div>
+        )}
         
         {location && (
           <div>
