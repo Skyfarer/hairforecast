@@ -115,9 +115,19 @@ function App() {
 
       <div className="card">
         <h2>Geolocation</h2>
-        <button onClick={getLocation} disabled={loading}>
-          {loading ? 'Getting location...' : 'Get My Location'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px' }}>
+          <button onClick={getLocation} disabled={loading}>
+            {loading ? 'Getting location...' : 'Get My Location'}
+          </button>
+          <button 
+            onClick={() => setShowManualInput(!showManualInput)}
+            style={{ 
+              backgroundColor: showManualInput ? '#4caf50' : '#646cff',
+            }}
+          >
+            {showManualInput ? 'Hide Manual Input' : 'Enter Location Manually'}
+          </button>
+        </div>
         
         {error && (
           <div className="error" style={{ whiteSpace: 'pre-line', color: 'red', margin: '10px 0' }}>
