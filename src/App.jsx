@@ -101,7 +101,13 @@ function App() {
         throw new Error('Failed to fetch country suggestions');
       }
       const data = await response.json();
-      setCountrySuggestions(data);
+      // Extract the countries array from the response
+      if (data.countries && Array.isArray(data.countries)) {
+        setCountrySuggestions(data.countries);
+      } else {
+        console.error('Unexpected API response format:', data);
+        setCountrySuggestions([]);
+      }
     } catch (error) {
       console.error('Error fetching country suggestions:', error);
       setCountrySuggestions([]);
@@ -128,7 +134,7 @@ function App() {
 
   // Handle country suggestion selection
   const handleCountrySelect = (country) => {
-    setManualLocation({...manualLocation, country});
+    setManualLocation({...manualLocation, country: country.name});
     setCountrySuggestions([]);
   };
 
@@ -225,7 +231,7 @@ function App() {
                     }}>
                       {countrySuggestions.map((country, index) => (
                         <li 
-                          key={index}
+                          key={country.id}
                           onClick={() => handleCountrySelect(country)}
                           style={{
                             padding: '8px 12px',
@@ -236,7 +242,7 @@ function App() {
                           onMouseOver={(e) => e.target.style.backgroundColor = '#f5f5f5'}
                           onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
                         >
-                          {country}
+                          {country.name}
                         </li>
                       ))}
                     </ul>
