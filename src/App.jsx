@@ -205,20 +205,6 @@ function App() {
           <div className="manual-location-form" style={{ margin: '15px 0', padding: '15px', border: '1px solid #ccc', borderRadius: '5px' }}>
             <h3>Enter your location manually</h3>
             <form onSubmit={handleManualLocationSubmit}>
-              {countrySelected && (
-                <div style={{ margin: '10px 0', animation: 'fadeIn 0.3s' }}>
-                  <label htmlFor="city" style={{ display: 'block', marginBottom: '5px' }}>City:</label>
-                  <input
-                    ref={cityInputRef}
-                    type="text"
-                    id="city"
-                    value={manualLocation.city}
-                    onChange={(e) => setManualLocation({...manualLocation, city: e.target.value})}
-                    style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
-                    required
-                  />
-                </div>
-              )}
               <div style={{ margin: '10px 0' }}>
                 <label htmlFor="country" style={{ display: 'block', marginBottom: '5px' }}>Country:</label>
                 <div style={{ position: 'relative' }}>
@@ -288,6 +274,20 @@ function App() {
                   )}
                 </div>
               </div>
+              {countrySelected && (
+                <div style={{ margin: '10px 0', animation: 'fadeIn 0.3s' }}>
+                  <label htmlFor="city" style={{ display: 'block', marginBottom: '5px' }}>City:</label>
+                  <input
+                    ref={cityInputRef}
+                    type="text"
+                    id="city"
+                    value={manualLocation.city}
+                    onChange={(e) => setManualLocation({...manualLocation, city: e.target.value})}
+                    style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
+                    required
+                  />
+                </div>
+              )}
               <button 
                 type="submit" 
                 style={{ 
