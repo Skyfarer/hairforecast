@@ -256,10 +256,20 @@ function App() {
                             style={{
                               padding: '8px 12px',
                               cursor: 'pointer',
-                              borderBottom: index < countrySuggestions.length - 1 ? '1px solid #eee' : 'none'
+                              borderBottom: index < countrySuggestions.length - 1 ? '1px solid #eee' : 'none',
+                              color: '#213547', // Dark text color for better contrast
+                              fontWeight: '400'
                             }}
-                            onMouseOver={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+                            onMouseOver={(e) => {
+                              e.target.style.backgroundColor = '#f0f0f0';
+                              e.target.style.color = '#000';
+                              e.target.style.fontWeight = '500';
+                            }}
+                            onMouseOut={(e) => {
+                              e.target.style.backgroundColor = 'transparent';
+                              e.target.style.color = '#213547';
+                              e.target.style.fontWeight = '400';
+                            }}
                           >
                             {countryName}
                           </li>
