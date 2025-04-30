@@ -96,17 +96,27 @@ function App() {
     
     setIsLoadingCountries(true);
     try {
+      console.log(`Fetching countries with query: ${query}`);
       const response = await fetch(`/api/countries?q=${encodeURIComponent(query)}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch country suggestions');
+        throw new Error(`Failed to fetch country suggestions: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
+      console.log('API response:', data);
+      
       // Extract the countries array from the response
       if (data.countries && Array.isArray(data.countries)) {
+        console.log(`Found ${data.countries.length} country suggestions`);
         setCountrySuggestions(data.countries);
       } else {
         console.error('Unexpected API response format:', data);
-        setCountrySuggestions([]);
+        // If data itself is an array, try using that
+        if (Array.isArray(data)) {
+          console.log('Using data array directly');
+          setCountrySuggestions(data);
+        } else {
+          setCountrySuggestions([]);
+        }
       }
     } catch (error) {
       console.error('Error fetching country suggestions:', error);
@@ -134,7 +144,11 @@ function App() {
 
   // Handle country suggestion selection
   const handleCountrySelect = (country) => {
-    setManualLocation({...manualLocation, country: country.name});
+    // Handle both object format and string format
+    const countryName = typeof country === 'object' ? country.name : country;
+    console.log('Selected country:', countryName);
+    
+    setManualLocation({...manualLocation, country: countryName});
     setCountrySuggestions([]);
   };
 
@@ -229,22 +243,28 @@ function App() {
                       listStyle: 'none',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                     }}>
-                      {countrySuggestions.map((country, index) => (
-                        <li 
-                          key={country.id}
-                          onClick={() => handleCountrySelect(country)}
-                          style={{
-                            padding: '8px 12px',
-                            cursor: 'pointer',
-                            borderBottom: index < countrySuggestions.length - 1 ? '1px solid #eee' : 'none',
-                            hover: { backgroundColor: '#f5f5f5' }
-                          }}
-                          onMouseOver={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                          onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
-                        >
-                          {country.name}
-                        </li>
-                      ))}
+                      {countrySuggestions.map((country, index) => {
+                        console.log('Rendering country:', country);
+                        // Handle both object format and string format
+                        const countryName = typeof country === 'object' ? country.name : country;
+                        const countryId = typeof country === 'object' ? country.id : index;
+                        
+                        return (
+                          <li 
+                            key={countryId}
+                            onClick={() => handleCountrySelect(country)}
+                            style={{
+                              padding: '8px 12px',
+                              cursor: 'pointer',
+                              borderBottom: index < countrySuggestions.length - 1 ? '1px solid #eee' : 'none'
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+                          >
+                            {countryName}
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </div>
