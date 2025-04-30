@@ -212,9 +212,12 @@ function App() {
   const handleCitySelect = (city) => {
     // Handle both object format and string format
     const cityName = typeof city === 'object' ? city.name : city;
-    console.log('Selected city:', cityName);
+    const stateCode = typeof city === 'object' && city.state_code ? city.state_code : '';
+    const displayName = stateCode ? `${cityName}, ${stateCode}` : cityName;
     
-    setManualLocation({...manualLocation, city: cityName});
+    console.log('Selected city:', displayName);
+    
+    setManualLocation({...manualLocation, city: displayName});
     setCitySuggestions([]);
   };
 
@@ -389,6 +392,8 @@ function App() {
                           // Handle both object format and string format
                           const cityName = typeof city === 'object' ? city.name : city;
                           const cityId = typeof city === 'object' ? city.id : index;
+                          const stateCode = typeof city === 'object' && city.state_code ? city.state_code : '';
+                          const displayName = stateCode ? `${cityName}, ${stateCode}` : cityName;
                           
                           return (
                             <li 
@@ -412,7 +417,7 @@ function App() {
                                 e.target.style.fontWeight = '400';
                               }}
                             >
-                              {cityName}
+                              {displayName}
                             </li>
                           );
                         })}
