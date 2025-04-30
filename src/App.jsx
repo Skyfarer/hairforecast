@@ -10,6 +10,7 @@ function App() {
   const [manualLocation, setManualLocation] = useState({ city: '', country: '' })
   const [countrySuggestions, setCountrySuggestions] = useState([])
   const [isLoadingCountries, setIsLoadingCountries] = useState(false)
+  const [countrySelected, setCountrySelected] = useState(false)
   const cityInputRef = useRef(null)
   const countryDebounceTimerRef = useRef(null)
 
@@ -131,6 +132,11 @@ function App() {
     const value = e.target.value;
     setManualLocation({...manualLocation, country: value});
     
+    // If user clears the country field, hide the city input
+    if (!value.trim()) {
+      setCountrySelected(false);
+    }
+    
     // Clear previous timer
     if (countryDebounceTimerRef.current) {
       clearTimeout(countryDebounceTimerRef.current);
@@ -150,6 +156,7 @@ function App() {
     
     setManualLocation({...manualLocation, country: countryName});
     setCountrySuggestions([]);
+    setCountrySelected(true);
   };
 
   // Focus on city input when manual input form appears
@@ -198,18 +205,20 @@ function App() {
           <div className="manual-location-form" style={{ margin: '15px 0', padding: '15px', border: '1px solid #ccc', borderRadius: '5px' }}>
             <h3>Enter your location manually</h3>
             <form onSubmit={handleManualLocationSubmit}>
-              <div style={{ margin: '10px 0' }}>
-                <label htmlFor="city" style={{ display: 'block', marginBottom: '5px' }}>City:</label>
-                <input
-                  ref={cityInputRef}
-                  type="text"
-                  id="city"
-                  value={manualLocation.city}
-                  onChange={(e) => setManualLocation({...manualLocation, city: e.target.value})}
-                  style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
-                  required
-                />
-              </div>
+              {countrySelected && (
+                <div style={{ margin: '10px 0', animation: 'fadeIn 0.3s' }}>
+                  <label htmlFor="city" style={{ display: 'block', marginBottom: '5px' }}>City:</label>
+                  <input
+                    ref={cityInputRef}
+                    type="text"
+                    id="city"
+                    value={manualLocation.city}
+                    onChange={(e) => setManualLocation({...manualLocation, city: e.target.value})}
+                    style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
+                    required
+                  />
+                </div>
+              )}
               <div style={{ margin: '10px 0' }}>
                 <label htmlFor="country" style={{ display: 'block', marginBottom: '5px' }}>Country:</label>
                 <div style={{ position: 'relative' }}>
