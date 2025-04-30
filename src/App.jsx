@@ -7,12 +7,15 @@ function App() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [showManualInput, setShowManualInput] = useState(false)
-  const [manualLocation, setManualLocation] = useState({ city: '', country: '' })
+  const [manualLocation, setManualLocation] = useState({ city: '', country: '', countryId: null })
   const [countrySuggestions, setCountrySuggestions] = useState([])
+  const [citySuggestions, setCitySuggestions] = useState([])
   const [isLoadingCountries, setIsLoadingCountries] = useState(false)
+  const [isLoadingCities, setIsLoadingCities] = useState(false)
   const [countrySelected, setCountrySelected] = useState(false)
   const cityInputRef = useRef(null)
   const countryDebounceTimerRef = useRef(null)
+  const cityDebounceTimerRef = useRef(null)
 
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -148,14 +151,83 @@ function App() {
     }, 300);
   };
 
+  // Fetch city suggestions from API
+  const fetchCitySuggestions = useCallback(async (query, countryId) => {
+    if (!query || query.length < 2 || !countryId) {
+      setCitySuggestions([]);
+      return;
+    }
+    
+    setIsLoadingCities(true);
+    try {
+      console.log(`Fetching cities with query: ${query} for country ID: ${countryId}`);
+      const response = await fetch(`/api/cities?country_id=${countryId}&q=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch city suggestions: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      console.log('City API response:', data);
+      
+      // Extract the cities array from the response
+      if (data.cities && Array.isArray(data.cities)) {
+        console.log(`Found ${data.cities.length} city suggestions`);
+        setCitySuggestions(data.cities);
+      } else {
+        console.error('Unexpected API response format for cities:', data);
+        // If data itself is an array, try using that
+        if (Array.isArray(data)) {
+          console.log('Using data array directly for cities');
+          setCitySuggestions(data);
+        } else {
+          setCitySuggestions([]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching city suggestions:', error);
+      setCitySuggestions([]);
+    } finally {
+      setIsLoadingCities(false);
+    }
+  }, []);
+
+  // Handle city input changes with debounce
+  const handleCityInputChange = (e) => {
+    const value = e.target.value;
+    setManualLocation({...manualLocation, city: value});
+    
+    // Clear previous timer
+    if (cityDebounceTimerRef.current) {
+      clearTimeout(cityDebounceTimerRef.current);
+    }
+    
+    // Set new timer for debounce
+    cityDebounceTimerRef.current = setTimeout(() => {
+      if (manualLocation.countryId) {
+        fetchCitySuggestions(value, manualLocation.countryId);
+      }
+    }, 300);
+  };
+
+  // Handle city suggestion selection
+  const handleCitySelect = (city) => {
+    // Handle both object format and string format
+    const cityName = typeof city === 'object' ? city.name : city;
+    console.log('Selected city:', cityName);
+    
+    setManualLocation({...manualLocation, city: cityName});
+    setCitySuggestions([]);
+  };
+
   // Handle country suggestion selection
   const handleCountrySelect = (country) => {
     // Handle both object format and string format
     const countryName = typeof country === 'object' ? country.name : country;
-    console.log('Selected country:', countryName);
+    const countryId = typeof country === 'object' ? country.id : null;
+    console.log('Selected country:', countryName, 'ID:', countryId);
     
-    setManualLocation({...manualLocation, country: countryName});
+    setManualLocation({...manualLocation, country: countryName, countryId: countryId, city: ''});
     setCountrySuggestions([]);
+    setCitySuggestions([]);
     setCountrySelected(true);
   };
 
@@ -166,11 +238,14 @@ function App() {
     }
   }, [showManualInput]);
   
-  // Clear debounce timer on unmount
+  // Clear debounce timers on unmount
   useEffect(() => {
     return () => {
       if (countryDebounceTimerRef.current) {
         clearTimeout(countryDebounceTimerRef.current);
+      }
+      if (cityDebounceTimerRef.current) {
+        clearTimeout(cityDebounceTimerRef.current);
       }
     };
   }, []);
@@ -277,15 +352,73 @@ function App() {
               {countrySelected && (
                 <div style={{ margin: '10px 0', animation: 'fadeIn 0.3s' }}>
                   <label htmlFor="city" style={{ display: 'block', marginBottom: '5px' }}>City:</label>
-                  <input
-                    ref={cityInputRef}
-                    type="text"
-                    id="city"
-                    value={manualLocation.city}
-                    onChange={(e) => setManualLocation({...manualLocation, city: e.target.value})}
-                    style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
-                    required
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      ref={cityInputRef}
+                      type="text"
+                      id="city"
+                      value={manualLocation.city}
+                      onChange={handleCityInputChange}
+                      style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
+                      required
+                      autoComplete="off"
+                    />
+                    {isLoadingCities && (
+                      <div style={{ position: 'absolute', right: '10px', top: '8px', fontSize: '14px' }}>
+                        Loading...
+                      </div>
+                    )}
+                    {citySuggestions.length > 0 && (
+                      <ul style={{ 
+                        position: 'absolute', 
+                        zIndex: 10,
+                        width: '100%', 
+                        maxWidth: '300px',
+                        maxHeight: '200px',
+                        overflowY: 'auto',
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        padding: '0',
+                        margin: '0',
+                        listStyle: 'none',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                      }}>
+                        {citySuggestions.map((city, index) => {
+                          console.log('Rendering city:', city);
+                          // Handle both object format and string format
+                          const cityName = typeof city === 'object' ? city.name : city;
+                          const cityId = typeof city === 'object' ? city.id : index;
+                          
+                          return (
+                            <li 
+                              key={cityId}
+                              onClick={() => handleCitySelect(city)}
+                              style={{
+                                padding: '8px 12px',
+                                cursor: 'pointer',
+                                borderBottom: index < citySuggestions.length - 1 ? '1px solid #eee' : 'none',
+                                color: '#213547', // Dark text color for better contrast
+                                fontWeight: '400'
+                              }}
+                              onMouseOver={(e) => {
+                                e.target.style.backgroundColor = '#f0f0f0';
+                                e.target.style.color = '#000';
+                                e.target.style.fontWeight = '500';
+                              }}
+                              onMouseOut={(e) => {
+                                e.target.style.backgroundColor = 'transparent';
+                                e.target.style.color = '#213547';
+                                e.target.style.fontWeight = '400';
+                              }}
+                            >
+                              {cityName}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
                 </div>
               )}
               <button 
