@@ -96,7 +96,7 @@ function App() {
     
     setIsLoadingCountries(true);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/countries?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`/api/countries?q=${encodeURIComponent(query)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch country suggestions');
       }
