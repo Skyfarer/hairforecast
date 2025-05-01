@@ -629,35 +629,35 @@ function App() {
                   <div style={{ 
                     marginTop: '15px', 
                     padding: '15px', 
-                    backgroundColor: weatherData.hfi <= 1 ? '#e6f7ff' : weatherData.hfi <= 3 ? '#fff7e6' : '#ffe6e6',
+                    backgroundColor: weatherData.hfi >= 8 ? '#e6f7ff' : weatherData.hfi >= 5 ? '#fff7e6' : '#ffe6e6',
                     borderRadius: '4px',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    borderLeft: `4px solid ${weatherData.hfi <= 1 ? '#1890ff' : weatherData.hfi <= 3 ? '#faad14' : '#f5222d'}`
+                    borderLeft: `4px solid ${weatherData.hfi >= 8 ? '#1890ff' : weatherData.hfi >= 5 ? '#faad14' : '#f5222d'}`
                   }}>
                   <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>Hair Forecast Index (HFI)</h4>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ 
                       fontSize: '2em', 
                       fontWeight: 'bold',
-                      color: weatherData.hfi <= 1 ? '#1890ff' : weatherData.hfi <= 3 ? '#faad14' : '#f5222d'
+                      color: weatherData.hfi >= 8 ? '#1890ff' : weatherData.hfi >= 5 ? '#faad14' : '#f5222d'
                     }}>
                       {weatherData.hfi}
                     </span>
                     <span style={{ 
                       padding: '5px 10px', 
                       borderRadius: '15px',
-                      backgroundColor: weatherData.hfi <= 1 ? '#e6f7ff' : weatherData.hfi <= 3 ? '#fff7e6' : '#ffe6e6',
-                      color: weatherData.hfi <= 1 ? '#1890ff' : weatherData.hfi <= 3 ? '#faad14' : '#f5222d',
+                      backgroundColor: weatherData.hfi >= 8 ? '#e6f7ff' : weatherData.hfi >= 5 ? '#fff7e6' : '#ffe6e6',
+                      color: weatherData.hfi >= 8 ? '#1890ff' : weatherData.hfi >= 5 ? '#faad14' : '#f5222d',
                       fontWeight: 'bold',
-                      border: `1px solid ${weatherData.hfi <= 1 ? '#91d5ff' : weatherData.hfi <= 3 ? '#ffd591' : '#ffa39e'}`
+                      border: `1px solid ${weatherData.hfi >= 8 ? '#91d5ff' : weatherData.hfi >= 5 ? '#ffd591' : '#ffa39e'}`
                     }}>
-                      {weatherData.hfi <= 1 ? 'Good Hair Day' : weatherData.hfi <= 3 ? 'Moderate Frizz Risk' : 'High Frizz Alert'}
+                      {weatherData.hfi >= 8 ? 'Great Hair Day' : weatherData.hfi >= 5 ? 'Moderate Hair Day' : 'Bad Hair Day'}
                     </span>
                   </div>
                   <p style={{ marginTop: '10px', color: '#666' }}>
-                    {weatherData.hfi <= 1 
+                    {weatherData.hfi >= 8 
                       ? 'Perfect conditions for your hair! Low humidity and gentle winds mean your style should stay in place all day.'
-                      : weatherData.hfi <= 3 
+                      : weatherData.hfi >= 5 
                         ? 'Some frizz possible. Consider using anti-frizz products today.'
                         : 'High frizz alert! Consider wearing your hair up or using strong hold products today.'}
                   </p>
