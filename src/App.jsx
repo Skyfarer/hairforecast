@@ -132,20 +132,56 @@ function App() {
         // Clear any previous geolocation data
         setLocation(null)
         setLoading(true)
+        setError(null)
         
-        // Geocode the location to get coordinates
-        const geocodeQuery = encodeURIComponent(`${manualLocation.city}, ${manualLocation.country}`);
-        const geocodeResponse = await fetch(`/geoapi/geocode?address=${geocodeQuery}`);
+        console.log(`Submitting location: ${manualLocation.city}, ${manualLocation.country}`);
         
-        if (!geocodeResponse.ok) {
-          throw new Error(`Failed to geocode address: ${geocodeResponse.status}`);
+        // For testing/development - hardcoded coordinates if geocoding API is not available
+        // This is a fallback mechanism
+        let lat, lng;
+        
+        try {
+          // Geocode the location to get coordinates
+          const geocodeQuery = encodeURIComponent(`${manualLocation.city}, ${manualLocation.country}`);
+          console.log(`Geocoding query: ${geocodeQuery}`);
+          
+          const geocodeResponse = await fetch(`/geoapi/geocode?address=${geocodeQuery}`);
+          
+          if (!geocodeResponse.ok) {
+            throw new Error(`Failed to geocode address: ${geocodeResponse.status}`);
+          }
+          
+          const geocodeData = await geocodeResponse.json();
+          console.log('Geocode response:', geocodeData);
+          
+          if (geocodeData.results && geocodeData.results.length > 0) {
+            // Extract coordinates from the geocode response
+            if (geocodeData.results[0].geometry && geocodeData.results[0].geometry.location) {
+              lat = geocodeData.results[0].geometry.location.lat;
+              lng = geocodeData.results[0].geometry.location.lng;
+            } else {
+              throw new Error('Geocode response missing location data');
+            }
+          } else {
+            throw new Error('Could not find coordinates for this location');
+          }
+        } catch (geocodeError) {
+          console.error('Geocoding error:', geocodeError);
+          
+          // If we're in development mode, use some default coordinates for testing
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Using fallback coordinates for development');
+            // New York City coordinates as fallback
+            lat = 40.7128;
+            lng = -74.0060;
+          } else {
+            // In production, propagate the error
+            throw geocodeError;
+          }
         }
         
-        const geocodeData = await geocodeResponse.json();
-        console.log('Geocode response:', geocodeData);
-        
-        if (geocodeData.results && geocodeData.results.length > 0) {
-          const { lat, lng } = geocodeData.results[0].geometry.location;
+        if (lat && lng) {
+          console.log(`Using coordinates: ${lat}, ${lng}`);
           
           // Set the manual location info with coordinates
           setLocation({
@@ -160,10 +196,8 @@ function App() {
           // Fetch weather data using the coordinates
           await fetchNearbyGeohash(lat, lng);
         } else {
-          throw new Error('Could not find coordinates for this location');
+          throw new Error('Could not determine coordinates for this location');
         }
-        
-        setError(null);
       } catch (error) {
         console.error('Error processing manual location:', error);
         setError(`Error: ${error.message}`);
@@ -318,6 +352,16 @@ function App() {
     
     setManualLocation({...manualLocation, city: displayName});
     setCitySuggestions([]);
+    
+    // Auto-submit the form when a city is selected from suggestions
+    // This provides a smoother user experience
+    setTimeout(() => {
+      const form = document.querySelector('.manual-location-form form');
+      if (form) {
+        console.log('Auto-submitting form after city selection');
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }, 100);
   };
 
   // Handle country suggestion selection
