@@ -6,6 +6,9 @@ function App() {
   const [location, setLocation] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [geohash, setGeohash] = useState(null)
+  const [wxApiLoading, setWxApiLoading] = useState(false)
+  const [wxApiError, setWxApiError] = useState(null)
   const [showManualInput, setShowManualInput] = useState(false)
   const [manualLocation, setManualLocation] = useState({ city: '', country: '', countryId: null })
   const [countrySuggestions, setCountrySuggestions] = useState([])
@@ -16,6 +19,34 @@ function App() {
   const cityInputRef = useRef(null)
   const countryDebounceTimerRef = useRef(null)
   const cityDebounceTimerRef = useRef(null)
+
+  // Function to fetch weather data from wxapi
+  const fetchNearbyGeohash = async (lat, lon) => {
+    setWxApiLoading(true);
+    setWxApiError(null);
+    setGeohash(null);
+    
+    try {
+      const response = await fetch(`/wxapi/nearby?lat=${lat}&lon=${lon}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch weather data: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Weather API response:', data);
+      
+      if (data.results && data.results.length > 0) {
+        setGeohash(data.results[0].geohash);
+      } else {
+        console.warn('No geohash found in the response');
+      }
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+      setWxApiError(`Failed to fetch weather data: ${error.message}`);
+    } finally {
+      setWxApiLoading(false);
+    }
+  };
 
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -30,11 +61,18 @@ function App() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
         setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        })
-        setLoading(false)
+          latitude: lat,
+          longitude: lon
+        });
+        
+        // Fetch weather data using the coordinates
+        fetchNearbyGeohash(lat, lon);
+        
+        setLoading(false);
       },
       (error) => {
         let errorMessage = `Error: ${error.message}`;
@@ -58,19 +96,51 @@ function App() {
     )
   }
 
-  const handleManualLocationSubmit = (e) => {
+  const handleManualLocationSubmit = async (e) => {
     e.preventDefault()
     if (manualLocation.city && manualLocation.country) {
-      // Clear any previous geolocation data
-      setLocation(null)
-      // Set the manual location info
-      setLocation({
-        manualEntry: true,
-        city: manualLocation.city,
-        country: manualLocation.country,
-        displayName: `${manualLocation.city}, ${manualLocation.country}`
-      })
-      setError(null)
+      try {
+        // Clear any previous geolocation data
+        setLocation(null)
+        setLoading(true)
+        
+        // Geocode the location to get coordinates
+        const geocodeQuery = encodeURIComponent(`${manualLocation.city}, ${manualLocation.country}`);
+        const geocodeResponse = await fetch(`/geoapi/geocode?address=${geocodeQuery}`);
+        
+        if (!geocodeResponse.ok) {
+          throw new Error(`Failed to geocode address: ${geocodeResponse.status}`);
+        }
+        
+        const geocodeData = await geocodeResponse.json();
+        console.log('Geocode response:', geocodeData);
+        
+        if (geocodeData.results && geocodeData.results.length > 0) {
+          const { lat, lng } = geocodeData.results[0].geometry.location;
+          
+          // Set the manual location info with coordinates
+          setLocation({
+            manualEntry: true,
+            city: manualLocation.city,
+            country: manualLocation.country,
+            displayName: `${manualLocation.city}, ${manualLocation.country}`,
+            latitude: lat,
+            longitude: lng
+          });
+          
+          // Fetch weather data using the coordinates
+          await fetchNearbyGeohash(lat, lng);
+        } else {
+          throw new Error('Could not find coordinates for this location');
+        }
+        
+        setError(null);
+      } catch (error) {
+        console.error('Error processing manual location:', error);
+        setError(`Error: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
     } else {
       setError('Please enter both city and country')
     }
@@ -450,6 +520,9 @@ function App() {
               <>
                 <p>Your location:</p>
                 <p>{location.displayName}</p>
+                {location.latitude && location.longitude && (
+                  <p>Coordinates: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>
+                )}
                 <p>
                   <a 
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.displayName)}`}
@@ -475,6 +548,20 @@ function App() {
                   </a>
                 </p>
               </>
+            )}
+            
+            {wxApiLoading && <p>Fetching weather data...</p>}
+            
+            {wxApiError && (
+              <div className="error" style={{ color: 'red', margin: '10px 0' }}>
+                {wxApiError}
+              </div>
+            )}
+            
+            {geohash && (
+              <div style={{ margin: '15px 0', padding: '10px', backgroundColor: '#f0f8ff', borderRadius: '5px' }}>
+                <p><strong>Weather Location Geohash:</strong> {geohash}</p>
+              </div>
             )}
           </div>
         )}
