@@ -450,7 +450,6 @@ function App() {
                     </ul>
                   )}
                   </div>
-                )}
               </div>
               {countrySelected && (
                 <div style={{ margin: '10px 0', animation: 'fadeIn 0.3s' }}>
@@ -662,7 +661,8 @@ function App() {
                         ? 'Some frizz possible. Consider using anti-frizz products today.'
                         : 'High frizz alert! Consider wearing your hair up or using strong hold products today.'}
                   </p>
-                </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
