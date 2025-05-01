@@ -53,16 +53,19 @@ function App() {
     setGeohash(null);
     
     try {
-      // Check if location is coordinates or a location name
+      // Always use lat/lon parameters if available
       let url;
-      if (typeof location === 'string') {
-        // It's a location name
+      if (location.latitude && location.longitude) {
+        // Use coordinates
+        url = `/wxapi/nearby?lat=${location.latitude}&lon=${location.longitude}`;
+      } else if (typeof location === 'string') {
+        // Fallback to location name if no coordinates
         url = `/wxapi/nearby?location=${encodeURIComponent(location)}`;
       } else {
-        // It's coordinates
-        url = `/wxapi/nearby?lat=${location.latitude}&lon=${location.longitude}`;
+        throw new Error('Invalid location format provided');
       }
       
+      console.log(`Fetching weather data with URL: ${url}`);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Failed to fetch weather data: ${response.status} ${response.statusText}`);
@@ -146,22 +149,51 @@ function App() {
         
         console.log(`Submitting location: ${manualLocation.city}, ${manualLocation.country}`);
         
-        // Get coordinates from the fetchNearbyGeohash function
-        // We'll pass the location name and let the API determine the coordinates
+        // Get coordinates for the entered location
         const locationQuery = `${manualLocation.city}, ${manualLocation.country}`;
         console.log(`Using location query: ${locationQuery}`);
         
-        // Set the manual location info
+        // First get coordinates for the location
+        console.log(`Geocoding location: ${locationQuery}`);
+        const geocodeResponse = await fetch(`/geoapi/geocode?address=${encodeURIComponent(locationQuery)}`);
+        
+        if (!geocodeResponse.ok) {
+          throw new Error(`Failed to geocode address: ${geocodeResponse.status}`);
+        }
+        
+        const geocodeData = await geocodeResponse.json();
+        console.log('Geocode response:', geocodeData);
+        
+        let lat, lng;
+        
+        if (geocodeData.results && geocodeData.results.length > 0) {
+          // Extract coordinates from the geocode response
+          if (geocodeData.results[0].geometry && geocodeData.results[0].geometry.location) {
+            lat = geocodeData.results[0].geometry.location.lat;
+            lng = geocodeData.results[0].geometry.location.lng;
+            console.log(`Found coordinates: ${lat}, ${lng}`);
+          } else {
+            throw new Error('Geocode response missing location data');
+          }
+        } else {
+          throw new Error('Could not find coordinates for this location');
+        }
+        
+        // Set the manual location info with coordinates
         setLocation({
           manualEntry: true,
           city: manualLocation.city,
           country: manualLocation.country,
-          displayName: `${manualLocation.city}, ${manualLocation.country}`
+          displayName: `${manualLocation.city}, ${manualLocation.country}`,
+          latitude: lat,
+          longitude: lng
         });
         
-        // Fetch weather data using the location name
-        // The API will determine the coordinates based on the location name
-        await fetchNearbyGeohash(locationQuery);
+        // Fetch weather data using the coordinates
+        await fetchNearbyGeohash({
+          latitude: lat,
+          longitude: lng
+        });
       } catch (error) {
         console.error('Error processing manual location:', error);
         setError(`Error: ${error.message}`);
@@ -331,16 +363,47 @@ function App() {
       
       console.log(`Using location query: ${locationQuery}`);
       
-      // Set the manual location info
+      // First get coordinates for the location
+      console.log(`Geocoding location: ${locationQuery}`);
+      const geocodeResponse = await fetch(`/geoapi/geocode?address=${encodeURIComponent(locationQuery)}`);
+      
+      if (!geocodeResponse.ok) {
+        throw new Error(`Failed to geocode address: ${geocodeResponse.status}`);
+      }
+      
+      const geocodeData = await geocodeResponse.json();
+      console.log('Geocode response:', geocodeData);
+      
+      let lat, lng;
+      
+      if (geocodeData.results && geocodeData.results.length > 0) {
+        // Extract coordinates from the geocode response
+        if (geocodeData.results[0].geometry && geocodeData.results[0].geometry.location) {
+          lat = geocodeData.results[0].geometry.location.lat;
+          lng = geocodeData.results[0].geometry.location.lng;
+          console.log(`Found coordinates: ${lat}, ${lng}`);
+        } else {
+          throw new Error('Geocode response missing location data');
+        }
+      } else {
+        throw new Error('Could not find coordinates for this location');
+      }
+      
+      // Set the manual location info with coordinates
       setLocation({
         manualEntry: true,
         city: displayName,
         country: manualLocation.country,
-        displayName: `${displayName}, ${manualLocation.country}`
+        displayName: `${displayName}, ${manualLocation.country}`,
+        latitude: lat,
+        longitude: lng
       });
       
-      // Fetch weather data using the location name
-      await fetchNearbyGeohash(locationQuery);
+      // Fetch weather data using the coordinates
+      await fetchNearbyGeohash({
+        latitude: lat,
+        longitude: lng
+      });
     } catch (error) {
       console.error('Error processing selected city:', error);
       setError(`Error: ${error.message}`);
