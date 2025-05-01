@@ -449,7 +449,8 @@ function App() {
                       })}
                     </ul>
                   )}
-                </div>
+                  </div>
+                )}
               </div>
               {countrySelected && (
                 <div style={{ margin: '10px 0', animation: 'fadeIn 0.3s' }}>
@@ -601,32 +602,39 @@ function App() {
               </div>
             )}
             
-            {weatherData && (
+            {weatherData && typeof weatherData === 'object' && (
               <div style={{ margin: '15px 0', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                 <h3 style={{ marginTop: '0', color: '#333' }}>Weather & Hair Forecast</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-                  <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                    <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Temperature</p>
-                    <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.temperature_f}°F</p>
-                  </div>
-                  <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                    <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Dewpoint</p>
-                    <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.dewpoint_f}°F</p>
-                  </div>
-                  <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                    <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Wind Speed</p>
-                    <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.wind_mph} mph</p>
-                  </div>
+                  {weatherData.temperature_f !== undefined && (
+                    <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                      <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Temperature</p>
+                      <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.temperature_f}°F</p>
+                    </div>
+                  )}
+                  {weatherData.dewpoint_f !== undefined && (
+                    <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                      <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Dewpoint</p>
+                      <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.dewpoint_f}°F</p>
+                    </div>
+                  )}
+                  {weatherData.wind_mph !== undefined && (
+                    <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                      <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Wind Speed</p>
+                      <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.wind_mph} mph</p>
+                    </div>
+                  )}
                 </div>
                 
-                <div style={{ 
-                  marginTop: '15px', 
-                  padding: '15px', 
-                  backgroundColor: weatherData.hfi <= 1 ? '#e6f7ff' : weatherData.hfi <= 3 ? '#fff7e6' : '#ffe6e6',
-                  borderRadius: '4px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                  borderLeft: `4px solid ${weatherData.hfi <= 1 ? '#1890ff' : weatherData.hfi <= 3 ? '#faad14' : '#f5222d'}`
-                }}>
+                {weatherData.hfi !== undefined && (
+                  <div style={{ 
+                    marginTop: '15px', 
+                    padding: '15px', 
+                    backgroundColor: weatherData.hfi <= 1 ? '#e6f7ff' : weatherData.hfi <= 3 ? '#fff7e6' : '#ffe6e6',
+                    borderRadius: '4px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    borderLeft: `4px solid ${weatherData.hfi <= 1 ? '#1890ff' : weatherData.hfi <= 3 ? '#faad14' : '#f5222d'}`
+                  }}>
                   <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>Hair Forecast Index (HFI)</h4>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ 
