@@ -603,7 +603,7 @@ function App() {
             
             {weatherData && typeof weatherData === 'object' && (
               <div style={{ margin: '15px 0', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ marginTop: '0', color: '#333' }}>Weather & Hair Forecast</h3>
+                <h3 style={{ marginTop: '0', color: '#333' }}>Weather &amp; Hair Forecast</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
                   {weatherData.temperature_f !== undefined && (
                     <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
