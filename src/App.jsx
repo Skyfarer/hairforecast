@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
+import { fetchHfiData, fetchNearbyGeohash } from './api/wxapi'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -23,67 +24,40 @@ function App() {
   const countryDebounceTimerRef = useRef(null)
   const cityDebounceTimerRef = useRef(null)
 
-  // Function to fetch HFI data using geohash
-  const fetchHfiData = async (geohash) => {
+  // Wrapper function for fetchHfiData with state management
+  const fetchHfiDataWithState = async (geohash) => {
     setHfiLoading(true);
     setHfiError(null);
     setWeatherData(null);
     
     try {
-      const response = await fetch(`/wxapi/hfi?interval=0h&geohash=${geohash}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch HFI data: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('HFI API response:', data);
+      const data = await fetchHfiData(geohash);
       setWeatherData(data);
     } catch (error) {
-      console.error('Error fetching HFI data:', error);
       setHfiError(`Failed to fetch HFI data: ${error.message}`);
     } finally {
       setHfiLoading(false);
     }
   };
 
-  // Function to fetch weather data from wxapi
-  const fetchNearbyGeohash = async (location) => {
+  // Wrapper function for fetchNearbyGeohash with state management
+  const fetchNearbyGeohashWithState = async (location) => {
     setWxApiLoading(true);
     setWxApiError(null);
     setGeohash(null);
     
     try {
-      // Always use lat/lon parameters if available
-      let url;
-      if (location.latitude && location.longitude) {
-        // Use coordinates
-        url = `/wxapi/nearby?lat=${location.latitude}&lon=${location.longitude}`;
-      } else if (typeof location === 'string') {
-        // Fallback to location name if no coordinates
-        url = `/wxapi/nearby?location=${encodeURIComponent(location)}`;
-      } else {
-        throw new Error('Invalid location format provided');
-      }
-      
-      console.log(`Fetching weather data with URL: ${url}`);
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch weather data: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('Weather API response:', data);
+      const data = await fetchNearbyGeohash(location);
       
       if (data.results && data.results.length > 0) {
         const receivedGeohash = data.results[0].geohash;
         setGeohash(receivedGeohash);
         // Fetch HFI data using the geohash
-        fetchHfiData(receivedGeohash);
+        fetchHfiDataWithState(receivedGeohash);
       } else {
         console.warn('No geohash found in the response');
       }
     } catch (error) {
-      console.error('Error fetching weather data:', error);
       setWxApiError(`Failed to fetch weather data: ${error.message}`);
     } finally {
       setWxApiLoading(false);
@@ -112,7 +86,7 @@ function App() {
         });
         
         // Fetch weather data using the coordinates
-        fetchNearbyGeohash({latitude: lat, longitude: lon});
+        fetchNearbyGeohashWithState({latitude: lat, longitude: lon});
         
         setLoading(false);
       },
@@ -174,7 +148,7 @@ function App() {
         });
         
         // Fetch weather data using the coordinates
-        await fetchNearbyGeohash({
+        await fetchNearbyGeohashWithState({
           latitude: lat,
           longitude: lng
         });
@@ -342,7 +316,7 @@ function App() {
       });
       
       // Fetch weather data using the coordinates
-      await fetchNearbyGeohash({
+      await fetchNearbyGeohashWithState({
         latitude: lat,
         longitude: lng
       });
