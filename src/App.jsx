@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { fetchHfiData, fetchNearbyGeohash } from './api/wxapi'
 import LocationFinder from './components/LocationFinder'
@@ -104,20 +104,6 @@ function App() {
     )
   }
 
-  // Define the refs that were being used in useEffect
-  const countryDebounceTimerRef = useRef(null);
-  const cityDebounceTimerRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (countryDebounceTimerRef.current) {
-        clearTimeout(countryDebounceTimerRef.current);
-      }
-      if (cityDebounceTimerRef.current) {
-        clearTimeout(cityDebounceTimerRef.current);
-      }
-    };
-  }, []);
 
   return (
     <>
