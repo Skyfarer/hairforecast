@@ -101,7 +101,7 @@ function App() {
     setIsLoadingCountries(true);
     try {
       console.log(`Fetching countries with query: ${query}`);
-      const response = await fetch(`/api/countries?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`/geoapi/countries?q=${encodeURIComponent(query)}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch country suggestions: ${response.status} ${response.statusText}`);
       }
@@ -161,7 +161,7 @@ function App() {
     setIsLoadingCities(true);
     try {
       console.log(`Fetching cities with query: ${query} for country ID: ${countryId}`);
-      const response = await fetch(`/api/cities?country_id=${countryId}&q=${encodeURIComponent(query)}`);
+      const response = await fetch(`/geoapi/cities?country_id=${countryId}&q=${encodeURIComponent(query)}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch city suggestions: ${response.status} ${response.statusText}`);
       }
