@@ -95,10 +95,14 @@ function App() {
         
         setError(errorMessage);
         setLoading(false);
-        setShowManualInput(true);
+        // Remove reference to undefined state setter
       }
     )
   }
+
+  // Define the refs that were being used in useEffect
+  const countryDebounceTimerRef = useRef(null);
+  const cityDebounceTimerRef = useRef(null);
 
   useEffect(() => {
     return () => {
