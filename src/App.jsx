@@ -342,7 +342,7 @@ function App() {
   };
 
   // Handle city suggestion selection
-  const handleCitySelect = (city) => {
+  const handleCitySelect = async (city) => {
     // Handle both object format and string format
     const cityName = typeof city === 'object' ? city.name : city;
     const stateCode = typeof city === 'object' && city.state_code ? city.state_code : '';
@@ -353,15 +353,66 @@ function App() {
     setManualLocation({...manualLocation, city: displayName});
     setCitySuggestions([]);
     
-    // Auto-submit the form when a city is selected from suggestions
-    // This provides a smoother user experience
-    setTimeout(() => {
-      const form = document.querySelector('.manual-location-form form');
-      if (form) {
-        console.log('Auto-submitting form after city selection');
-        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    // Instead of auto-submitting the form, directly handle the geocoding and API calls
+    try {
+      // Clear any previous geolocation data
+      setLocation(null);
+      setLoading(true);
+      setError(null);
+      
+      console.log(`Processing selected location: ${displayName}, ${manualLocation.country}`);
+      
+      // Geocode the location to get coordinates
+      const geocodeQuery = encodeURIComponent(`${displayName}, ${manualLocation.country}`);
+      console.log(`Geocoding query: ${geocodeQuery}`);
+      
+      const geocodeResponse = await fetch(`/geoapi/geocode?address=${geocodeQuery}`);
+      
+      if (!geocodeResponse.ok) {
+        throw new Error(`Failed to geocode address: ${geocodeResponse.status}`);
       }
-    }, 100);
+      
+      const geocodeData = await geocodeResponse.json();
+      console.log('Geocode response:', geocodeData);
+      
+      let lat, lng;
+      
+      if (geocodeData.results && geocodeData.results.length > 0) {
+        // Extract coordinates from the geocode response
+        if (geocodeData.results[0].geometry && geocodeData.results[0].geometry.location) {
+          lat = geocodeData.results[0].geometry.location.lat;
+          lng = geocodeData.results[0].geometry.location.lng;
+        } else {
+          throw new Error('Geocode response missing location data');
+        }
+      } else {
+        throw new Error('Could not find coordinates for this location');
+      }
+      
+      if (lat && lng) {
+        console.log(`Using coordinates: ${lat}, ${lng}`);
+        
+        // Set the manual location info with coordinates
+        setLocation({
+          manualEntry: true,
+          city: displayName,
+          country: manualLocation.country,
+          displayName: `${displayName}, ${manualLocation.country}`,
+          latitude: lat,
+          longitude: lng
+        });
+        
+        // Fetch weather data using the coordinates
+        await fetchNearbyGeohash(lat, lng);
+      } else {
+        throw new Error('Could not determine coordinates for this location');
+      }
+    } catch (error) {
+      console.error('Error processing selected city:', error);
+      setError(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Handle country suggestion selection
