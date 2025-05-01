@@ -83,23 +83,8 @@ function App() {
         setLoading(false);
       },
       (error) => {
-        let errorMessage = `Error: ${error.message}`;
-        
-        // Add helpful message for common permission errors
-        if (error.code === error.PERMISSION_DENIED) {
-          errorMessage += "\n\nThis may be because:";
-          errorMessage += "\n1. You denied permission";
-          errorMessage += "\n2. You're not using HTTPS (required for geolocation except on localhost)";
-          errorMessage += "\n3. Your browser's privacy settings are blocking geolocation";
-          
-          if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-            errorMessage += "\n\nTry accessing this site via HTTPS instead.";
-          }
-        }
-        
-        setError(errorMessage);
+        setError(`Error: ${error.message}`);
         setLoading(false);
-        // Remove reference to undefined state setter
       }
     )
   }
