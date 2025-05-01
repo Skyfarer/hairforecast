@@ -204,7 +204,7 @@ function App() {
     // getLocation()
   }, [])
 
-  // Mock country suggestions instead of API call
+  // Fetch country suggestions
   const fetchCountrySuggestions = useCallback(async (query) => {
     if (!query || query.length < 2) {
       setCountrySuggestions([]);
@@ -215,27 +215,12 @@ function App() {
     try {
       console.log(`Searching for countries with query: ${query}`);
       
-      // Mock data - common countries
-      const mockCountries = [
-        { id: 1, name: 'United States' },
-        { id: 2, name: 'Canada' },
-        { id: 3, name: 'United Kingdom' },
-        { id: 4, name: 'Australia' },
-        { id: 5, name: 'Germany' },
-        { id: 6, name: 'France' },
-        { id: 7, name: 'Japan' },
-        { id: 8, name: 'China' },
-        { id: 9, name: 'India' },
-        { id: 10, name: 'Brazil' }
-      ];
+      // In a real app, this would be an API call
+      // For now, just simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Filter countries based on query
-      const filteredCountries = mockCountries.filter(country => 
-        country.name.toLowerCase().includes(query.toLowerCase())
-      );
-      
-      console.log(`Found ${filteredCountries.length} country suggestions`);
-      setCountrySuggestions(filteredCountries);
+      // Return empty results for now
+      setCountrySuggestions([]);
       
     } catch (error) {
       console.error('Error with country suggestions:', error);
@@ -266,7 +251,7 @@ function App() {
     }, 300);
   };
 
-  // Mock city suggestions instead of API call
+  // Fetch city suggestions
   const fetchCitySuggestions = useCallback(async (query, countryId) => {
     if (!query || query.length < 2 || !countryId) {
       setCitySuggestions([]);
@@ -277,44 +262,12 @@ function App() {
     try {
       console.log(`Searching for cities with query: ${query} for country ID: ${countryId}`);
       
-      // Mock data - major cities based on country ID
-      let mockCities = [];
+      // In a real app, this would be an API call
+      // For now, just simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Different cities for different countries
-      if (countryId === 1) { // United States
-        mockCities = [
-          { id: 1, name: 'New York', state_code: 'NY' },
-          { id: 2, name: 'Los Angeles', state_code: 'CA' },
-          { id: 3, name: 'Chicago', state_code: 'IL' },
-          { id: 4, name: 'Houston', state_code: 'TX' },
-          { id: 5, name: 'Phoenix', state_code: 'AZ' }
-        ];
-      } else if (countryId === 2) { // Canada
-        mockCities = [
-          { id: 6, name: 'Toronto', state_code: 'ON' },
-          { id: 7, name: 'Montreal', state_code: 'QC' },
-          { id: 8, name: 'Vancouver', state_code: 'BC' },
-          { id: 9, name: 'Calgary', state_code: 'AB' },
-          { id: 10, name: 'Ottawa', state_code: 'ON' }
-        ];
-      } else {
-        // Generic cities for other countries
-        mockCities = [
-          { id: 11, name: 'Capital City' },
-          { id: 12, name: 'Major City 1' },
-          { id: 13, name: 'Major City 2' },
-          { id: 14, name: 'Major City 3' },
-          { id: 15, name: 'Major City 4' }
-        ];
-      }
-      
-      // Filter cities based on query
-      const filteredCities = mockCities.filter(city => 
-        city.name.toLowerCase().includes(query.toLowerCase())
-      );
-      
-      console.log(`Found ${filteredCities.length} city suggestions`);
-      setCitySuggestions(filteredCities);
+      // Return empty results for now
+      setCitySuggestions([]);
       
     } catch (error) {
       console.error('Error with city suggestions:', error);
