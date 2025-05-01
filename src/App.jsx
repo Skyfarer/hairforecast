@@ -162,9 +162,6 @@ function App() {
         // Fetch weather data using the location name
         // The API will determine the coordinates based on the location name
         await fetchNearbyGeohash(locationQuery);
-        } else {
-          throw new Error('Could not determine coordinates for this location');
-        }
       } catch (error) {
         console.error('Error processing manual location:', error);
         setError(`Error: ${error.message}`);
@@ -344,9 +341,6 @@ function App() {
       
       // Fetch weather data using the location name
       await fetchNearbyGeohash(locationQuery);
-      } else {
-        throw new Error('Could not determine coordinates for this location');
-      }
     } catch (error) {
       console.error('Error processing selected city:', error);
       setError(`Error: ${error.message}`);
