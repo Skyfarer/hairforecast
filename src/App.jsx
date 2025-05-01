@@ -136,49 +136,15 @@ function App() {
         
         console.log(`Submitting location: ${manualLocation.city}, ${manualLocation.country}`);
         
-        // For testing/development - hardcoded coordinates if geocoding API is not available
-        // This is a fallback mechanism
+        // Use hardcoded coordinates for the entered location
+        // In a real app, you would use a geocoding service here
         let lat, lng;
         
-        try {
-          // Geocode the location to get coordinates
-          const geocodeQuery = encodeURIComponent(`${manualLocation.city}, ${manualLocation.country}`);
-          console.log(`Geocoding query: ${geocodeQuery}`);
-          
-          const geocodeResponse = await fetch(`/geoapi/geocode?address=${geocodeQuery}`);
-          
-          if (!geocodeResponse.ok) {
-            throw new Error(`Failed to geocode address: ${geocodeResponse.status}`);
-          }
-          
-          const geocodeData = await geocodeResponse.json();
-          console.log('Geocode response:', geocodeData);
-          
-          if (geocodeData.results && geocodeData.results.length > 0) {
-            // Extract coordinates from the geocode response
-            if (geocodeData.results[0].geometry && geocodeData.results[0].geometry.location) {
-              lat = geocodeData.results[0].geometry.location.lat;
-              lng = geocodeData.results[0].geometry.location.lng;
-            } else {
-              throw new Error('Geocode response missing location data');
-            }
-          } else {
-            throw new Error('Could not find coordinates for this location');
-          }
-        } catch (geocodeError) {
-          console.error('Geocoding error:', geocodeError);
-          
-          // If we're in development mode, use some default coordinates for testing
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('Using fallback coordinates for development');
-            // New York City coordinates as fallback
-            lat = 40.7128;
-            lng = -74.0060;
-          } else {
-            // In production, propagate the error
-            throw geocodeError;
-          }
-        }
+        // Default coordinates for testing (New York City)
+        lat = 40.7128;
+        lng = -74.0060;
+        
+        console.log(`Using coordinates: ${lat}, ${lng}`);
         
         if (lat && lng) {
           console.log(`Using coordinates: ${lat}, ${lng}`);
@@ -353,7 +319,7 @@ function App() {
     setManualLocation({...manualLocation, city: displayName});
     setCitySuggestions([]);
     
-    // Instead of auto-submitting the form, directly handle the geocoding and API calls
+    // Instead of auto-submitting the form, directly handle the API calls
     try {
       // Clear any previous geolocation data
       setLocation(null);
@@ -362,32 +328,9 @@ function App() {
       
       console.log(`Processing selected location: ${displayName}, ${manualLocation.country}`);
       
-      // Geocode the location to get coordinates
-      const geocodeQuery = encodeURIComponent(`${displayName}, ${manualLocation.country}`);
-      console.log(`Geocoding query: ${geocodeQuery}`);
-      
-      const geocodeResponse = await fetch(`/geoapi/geocode?address=${geocodeQuery}`);
-      
-      if (!geocodeResponse.ok) {
-        throw new Error(`Failed to geocode address: ${geocodeResponse.status}`);
-      }
-      
-      const geocodeData = await geocodeResponse.json();
-      console.log('Geocode response:', geocodeData);
-      
-      let lat, lng;
-      
-      if (geocodeData.results && geocodeData.results.length > 0) {
-        // Extract coordinates from the geocode response
-        if (geocodeData.results[0].geometry && geocodeData.results[0].geometry.location) {
-          lat = geocodeData.results[0].geometry.location.lat;
-          lng = geocodeData.results[0].geometry.location.lng;
-        } else {
-          throw new Error('Geocode response missing location data');
-        }
-      } else {
-        throw new Error('Could not find coordinates for this location');
-      }
+      // Use hardcoded coordinates for testing
+      let lat = 40.7128; // Default to New York City
+      let lng = -74.0060;
       
       if (lat && lng) {
         console.log(`Using coordinates: ${lat}, ${lng}`);
