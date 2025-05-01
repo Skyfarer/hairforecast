@@ -13,16 +13,6 @@ function App() {
   const [weatherData, setWeatherData] = useState(null)
   const [hfiLoading, setHfiLoading] = useState(false)
   const [hfiError, setHfiError] = useState(null)
-  const [showManualInput, setShowManualInput] = useState(false)
-  const [manualLocation, setManualLocation] = useState({ city: '', country: '', countryId: null })
-  const [countrySuggestions, setCountrySuggestions] = useState([])
-  const [citySuggestions, setCitySuggestions] = useState([])
-  const [isLoadingCountries, setIsLoadingCountries] = useState(false)
-  const [isLoadingCities, setIsLoadingCities] = useState(false)
-  const [countrySelected, setCountrySelected] = useState(false)
-  const cityInputRef = useRef(null)
-  const countryDebounceTimerRef = useRef(null)
-  const cityDebounceTimerRef = useRef(null)
 
   // Wrapper function for fetchHfiData with state management
   const fetchHfiDataWithState = async (geohash) => {
@@ -67,13 +57,11 @@ function App() {
   const getLocation = () => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser')
-      setShowManualInput(true)
       return
     }
 
     setLoading(true)
     setError(null)
-    setShowManualInput(false)
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -172,7 +160,6 @@ function App() {
       setError("Warning: This app is not running in a secure context (HTTPS). " +
                "Geolocation may not work in some browsers. " +
                "Try accessing via localhost or an HTTPS connection.");
-      setShowManualInput(true);
     }
     // You can uncomment this if you want to get location on page load
     // getLocation()
@@ -370,14 +357,6 @@ function App() {
           <button onClick={getLocation} disabled={loading}>
             {loading ? 'Getting location...' : 'Get My Location'}
           </button>
-          <button 
-            onClick={() => setShowManualInput(!showManualInput)}
-            style={{ 
-              backgroundColor: showManualInput ? '#4caf50' : '#646cff',
-            }}
-          >
-            {showManualInput ? 'Hide Manual Input' : 'Enter Location Manually'}
-          </button>
         </div>
         
         {error && (
@@ -386,206 +365,21 @@ function App() {
           </div>
         )}
         
-        {showManualInput && (
-          <div className="manual-location-form" style={{ margin: '15px 0', padding: '15px', border: '1px solid #ccc', borderRadius: '5px' }}>
-            <h3>Enter your location manually</h3>
-            <form onSubmit={handleManualLocationSubmit}>
-              <div style={{ margin: '10px 0' }}>
-                <label htmlFor="country" style={{ display: 'block', marginBottom: '5px' }}>Country:</label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="text"
-                    id="country"
-                    value={manualLocation.country}
-                    onChange={handleCountryInputChange}
-                    style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
-                    required
-                    autoComplete="off"
-                  />
-                  {isLoadingCountries && (
-                    <div style={{ position: 'absolute', right: '10px', top: '8px', fontSize: '14px' }}>
-                      Loading...
-                    </div>
-                  )}
-                  {countrySuggestions.length > 0 && (
-                    <ul style={{ 
-                      position: 'absolute', 
-                      zIndex: 10,
-                      width: '100%', 
-                      maxWidth: '300px',
-                      maxHeight: '200px',
-                      overflowY: 'auto',
-                      backgroundColor: 'white',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px',
-                      padding: '0',
-                      margin: '0',
-                      listStyle: 'none',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                    }}>
-                      {countrySuggestions.map((country, index) => {
-                        console.log('Rendering country:', country);
-                        // Handle both object format and string format
-                        const countryName = typeof country === 'object' ? country.name : country;
-                        const countryId = typeof country === 'object' ? country.id : index;
-                        
-                        return (
-                          <li 
-                            key={countryId}
-                            onClick={() => handleCountrySelect(country)}
-                            style={{
-                              padding: '8px 12px',
-                              cursor: 'pointer',
-                              borderBottom: index < countrySuggestions.length - 1 ? '1px solid #eee' : 'none',
-                              color: '#213547', // Dark text color for better contrast
-                              fontWeight: '400'
-                            }}
-                            onMouseOver={(e) => {
-                              e.target.style.backgroundColor = '#f0f0f0';
-                              e.target.style.color = '#000';
-                              e.target.style.fontWeight = '500';
-                            }}
-                            onMouseOut={(e) => {
-                              e.target.style.backgroundColor = 'transparent';
-                              e.target.style.color = '#213547';
-                              e.target.style.fontWeight = '400';
-                            }}
-                          >
-                            {countryName}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                  </div>
-              </div>
-              {countrySelected && (
-                <div style={{ margin: '10px 0', animation: 'fadeIn 0.3s' }}>
-                  <label htmlFor="city" style={{ display: 'block', marginBottom: '5px' }}>City:</label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      ref={cityInputRef}
-                      type="text"
-                      id="city"
-                      value={manualLocation.city}
-                      onChange={handleCityInputChange}
-                      style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
-                      required
-                      autoComplete="off"
-                    />
-                    {isLoadingCities && (
-                      <div style={{ position: 'absolute', right: '10px', top: '8px', fontSize: '14px' }}>
-                        Loading...
-                      </div>
-                    )}
-                    {citySuggestions.length > 0 && (
-                      <ul style={{ 
-                        position: 'absolute', 
-                        zIndex: 10,
-                        width: '100%', 
-                        maxWidth: '300px',
-                        maxHeight: '200px',
-                        overflowY: 'auto',
-                        backgroundColor: 'white',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        padding: '0',
-                        margin: '0',
-                        listStyle: 'none',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                      }}>
-                        {citySuggestions.map((city, index) => {
-                          console.log('Rendering city:', city);
-                          // Handle both object format and string format
-                          const cityName = typeof city === 'object' ? city.name : city;
-                          const cityId = typeof city === 'object' ? city.id : index;
-                          const stateCode = typeof city === 'object' && city.state_code ? city.state_code : '';
-                          const displayName = stateCode ? `${cityName}, ${stateCode}` : cityName;
-                          
-                          return (
-                            <li 
-                              key={cityId}
-                              onClick={() => handleCitySelect(city)}
-                              style={{
-                                padding: '8px 12px',
-                                cursor: 'pointer',
-                                borderBottom: index < citySuggestions.length - 1 ? '1px solid #eee' : 'none',
-                                color: '#213547', // Dark text color for better contrast
-                                fontWeight: '400'
-                              }}
-                              onMouseOver={(e) => {
-                                e.target.style.backgroundColor = '#f0f0f0';
-                                e.target.style.color = '#000';
-                                e.target.style.fontWeight = '500';
-                              }}
-                              onMouseOut={(e) => {
-                                e.target.style.backgroundColor = 'transparent';
-                                e.target.style.color = '#213547';
-                                e.target.style.fontWeight = '400';
-                              }}
-                            >
-                              {displayName}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              )}
-              <button 
-                type="submit" 
-                style={{ 
-                  padding: '8px 16px', 
-                  backgroundColor: '#646cff', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '4px', 
-                  cursor: 'pointer',
-                  marginTop: '10px'
-                }}
-              >
-                Set Location
-              </button>
-            </form>
-          </div>
-        )}
         
         {location && (
           <div>
-            {location.manualEntry ? (
-              <>
-                <p>Your location:</p>
-                <p>{location.displayName}</p>
-                {location.latitude && location.longitude && (
-                  <p>Coordinates: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>
-                )}
-                <p>
-                  <a 
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.displayName)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View on Google Maps
-                  </a>
-                </p>
-              </>
-            ) : (
-              <>
-                <p>Your coordinates:</p>
-                <p>Latitude: {location.latitude}</p>
-                <p>Longitude: {location.longitude}</p>
-                <p>
-                  <a 
-                    href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View on Google Maps
-                  </a>
-                </p>
-              </>
-            )}
+            <p>Your coordinates:</p>
+            <p>Latitude: {location.latitude}</p>
+            <p>Longitude: {location.longitude}</p>
+            <p>
+              <a 
+                href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View on Google Maps
+              </a>
+            </p>
             
             {wxApiLoading && <p>Fetching weather data...</p>}
             
