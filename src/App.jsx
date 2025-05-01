@@ -47,13 +47,23 @@ function App() {
   };
 
   // Function to fetch weather data from wxapi
-  const fetchNearbyGeohash = async (lat, lon) => {
+  const fetchNearbyGeohash = async (location) => {
     setWxApiLoading(true);
     setWxApiError(null);
     setGeohash(null);
     
     try {
-      const response = await fetch(`/wxapi/nearby?lat=${lat}&lon=${lon}`);
+      // Check if location is coordinates or a location name
+      let url;
+      if (typeof location === 'string') {
+        // It's a location name
+        url = `/wxapi/nearby?location=${encodeURIComponent(location)}`;
+      } else {
+        // It's coordinates
+        url = `/wxapi/nearby?lat=${location.latitude}&lon=${location.longitude}`;
+      }
+      
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Failed to fetch weather data: ${response.status} ${response.statusText}`);
       }
@@ -99,7 +109,7 @@ function App() {
         });
         
         // Fetch weather data using the coordinates
-        fetchNearbyGeohash(lat, lon);
+        fetchNearbyGeohash({latitude: lat, longitude: lon});
         
         setLoading(false);
       },
@@ -136,31 +146,22 @@ function App() {
         
         console.log(`Submitting location: ${manualLocation.city}, ${manualLocation.country}`);
         
-        // Use hardcoded coordinates for the entered location
-        // In a real app, you would use a geocoding service here
-        let lat, lng;
+        // Get coordinates from the fetchNearbyGeohash function
+        // We'll pass the location name and let the API determine the coordinates
+        const locationQuery = `${manualLocation.city}, ${manualLocation.country}`;
+        console.log(`Using location query: ${locationQuery}`);
         
-        // Default coordinates for testing (New York City)
-        lat = 40.7128;
-        lng = -74.0060;
+        // Set the manual location info
+        setLocation({
+          manualEntry: true,
+          city: manualLocation.city,
+          country: manualLocation.country,
+          displayName: `${manualLocation.city}, ${manualLocation.country}`
+        });
         
-        console.log(`Using coordinates: ${lat}, ${lng}`);
-        
-        if (lat && lng) {
-          console.log(`Using coordinates: ${lat}, ${lng}`);
-          
-          // Set the manual location info with coordinates
-          setLocation({
-            manualEntry: true,
-            city: manualLocation.city,
-            country: manualLocation.country,
-            displayName: `${manualLocation.city}, ${manualLocation.country}`,
-            latitude: lat,
-            longitude: lng
-          });
-          
-          // Fetch weather data using the coordinates
-          await fetchNearbyGeohash(lat, lng);
+        // Fetch weather data using the location name
+        // The API will determine the coordinates based on the location name
+        await fetchNearbyGeohash(locationQuery);
         } else {
           throw new Error('Could not determine coordinates for this location');
         }
@@ -328,25 +329,21 @@ function App() {
       
       console.log(`Processing selected location: ${displayName}, ${manualLocation.country}`);
       
-      // Use hardcoded coordinates for testing
-      let lat = 40.7128; // Default to New York City
-      let lng = -74.0060;
+      // Create a location query string
+      const locationQuery = `${displayName}, ${manualLocation.country}`;
       
-      if (lat && lng) {
-        console.log(`Using coordinates: ${lat}, ${lng}`);
-        
-        // Set the manual location info with coordinates
-        setLocation({
-          manualEntry: true,
-          city: displayName,
-          country: manualLocation.country,
-          displayName: `${displayName}, ${manualLocation.country}`,
-          latitude: lat,
-          longitude: lng
-        });
-        
-        // Fetch weather data using the coordinates
-        await fetchNearbyGeohash(lat, lng);
+      console.log(`Using location query: ${locationQuery}`);
+      
+      // Set the manual location info
+      setLocation({
+        manualEntry: true,
+        city: displayName,
+        country: manualLocation.country,
+        displayName: `${displayName}, ${manualLocation.country}`
+      });
+      
+      // Fetch weather data using the location name
+      await fetchNearbyGeohash(locationQuery);
       } else {
         throw new Error('Could not determine coordinates for this location');
       }
