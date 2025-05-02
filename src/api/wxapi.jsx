@@ -55,3 +55,24 @@ export const fetchNearbyGeohash = async (location) => {
     throw error;
   }
 };
+
+/**
+ * Fetches countries list with optional search query
+ * @param {string} query - Optional search query to filter countries
+ * @returns {Promise} - Promise that resolves to the countries data
+ */
+export const fetchCountries = async (query = '') => {
+  try {
+    const response = await fetch(`/geoapi/countries${query ? `?q=${encodeURIComponent(query)}` : ''}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch countries: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Countries API response:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching countries:', error);
+    throw error;
+  }
+};
