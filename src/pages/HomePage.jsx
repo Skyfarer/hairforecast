@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchHfiData, fetchNearbyGeohash } from '../api/wxapi';
+import { fetchHfiData, fetchNearbyGeohash } from '../api/api';
 import LocationFinder from '../components/LocationFinder';
 import LocationDisplay from '../components/LocationDisplay';
 import WeatherStatus from '../components/WeatherStatus';

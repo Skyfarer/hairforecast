@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchHfiData, fetchNearbyGeohash } from '../api/wxapi';
+import { fetchHfiData, fetchNearbyGeohash, fetchCountries } from '../api/api';
 import ManualLocationEntry from '../components/ManualLocationEntry';
 import WeatherStatus from '../components/WeatherStatus';
 import WeatherDisplay from '../components/WeatherDisplay';
@@ -61,7 +61,7 @@ function ManualLocationPage() {
 
   return (
     <>
-      <h1>Manual Location Entry</h1>
+      <h1>Country Weather Lookup</h1>
       
       <div style={{ margin: '20px 0' }}>
         <Link to="/" style={{ 
