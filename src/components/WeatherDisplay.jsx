@@ -11,11 +11,13 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
           onClick={onToggleUnits}
           style={{
             padding: '5px 10px',
-            backgroundColor: '#fff',
-            border: '1px solid #ccc',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: '1px solid #4CAF50',
             borderRadius: '4px',
             cursor: 'pointer',
-            fontSize: '0.9em'
+            fontSize: '0.9em',
+            fontWeight: 'bold'
           }}
         >
           {useMetric ? 'Switch to °F' : 'Switch to °C'}
