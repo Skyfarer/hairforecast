@@ -93,13 +93,13 @@ function HomePage() {
     <>
       <h1>Hair Forecast</h1>
       
-      <LocationFinder 
-        loading={loading}
-        getLocation={getLocation}
-        error={error}
-      />
-      
-      <div style={{ margin: '20px 0' }}>
+      <div style={{ display: 'flex', gap: '15px', margin: '20px 0' }}>
+        <LocationFinder 
+          loading={loading}
+          getLocation={getLocation}
+          error={error}
+        />
+        
         <Link to="/manual-location" style={{ 
           padding: '8px 16px', 
           backgroundColor: '#4CAF50',
@@ -107,11 +107,18 @@ function HomePage() {
           borderRadius: '4px',
           textDecoration: 'none',
           fontWeight: 'bold',
-          display: 'inline-block'
+          display: 'inline-block',
+          height: 'fit-content'
         }}>
           Enter Location Manually
         </Link>
       </div>
+      
+      {error && (
+        <div className="error" style={{ whiteSpace: 'pre-line', color: 'red', margin: '10px 0' }}>
+          {error}
+        </div>
+      )}
       
       {location && (
         <div>

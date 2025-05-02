@@ -10,7 +10,7 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
         <button 
           onClick={onToggleUnits}
           style={{
-            padding: '5px 10px',
+            padding: '8px 16px',
             backgroundColor: '#4CAF50',
             color: 'white',
             border: '1px solid #4CAF50',

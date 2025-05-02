@@ -84,7 +84,7 @@ function ManualLocationPage() {
     <>
       <h1>Location Weather Lookup</h1>
       
-      <div style={{ margin: '20px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
         <Link to="/" style={{ 
           padding: '8px 16px', 
           backgroundColor: '#4CAF50',
@@ -92,10 +92,13 @@ function ManualLocationPage() {
           borderRadius: '4px',
           textDecoration: 'none',
           fontWeight: 'bold',
-          display: 'inline-block'
+          display: 'inline-block',
+          marginRight: '20px'
         }}>
           Back to Home
         </Link>
+        
+        <h2 style={{ margin: '0' }}>Hair Forecast</h2>
       </div>
       
       <ManualLocationEntry 
