@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchHfiData, fetchNearbyGeohash } from '../api/api';
 import LocationFinder from '../components/LocationFinder';
@@ -16,6 +16,7 @@ function HomePage() {
   const [weatherData, setWeatherData] = useState(null);
   const [hfiLoading, setHfiLoading] = useState(false);
   const [hfiError, setHfiError] = useState(null);
+  const [useMetric, setUseMetric] = useState(false);
 
   // Wrapper function for fetchHfiData with state management
   const fetchHfiDataWithState = async (geohash) => {
@@ -122,7 +123,11 @@ function HomePage() {
             hfiError={hfiError}
           />
           
-          <WeatherDisplay weatherData={weatherData} />
+          <WeatherDisplay 
+            weatherData={weatherData} 
+            useMetric={useMetric}
+            onToggleUnits={() => setUseMetric(!useMetric)}
+          />
         </div>
       )}
     </>

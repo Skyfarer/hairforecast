@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchHfiData, fetchNearbyGeohash, fetchCountries } from '../api/api';
 import ManualLocationEntry from '../components/ManualLocationEntry';
@@ -13,6 +13,7 @@ function ManualLocationPage() {
   const [weatherData, setWeatherData] = useState(null);
   const [hfiLoading, setHfiLoading] = useState(false);
   const [hfiError, setHfiError] = useState(null);
+  const [useMetric, setUseMetric] = useState(true); // Default to metric for most countries
 
   // Wrapper function for fetchHfiData with state management
   const fetchHfiDataWithState = async (geohash) => {
@@ -69,6 +70,15 @@ function ManualLocationPage() {
       fetchNearbyGeohashWithState(location);
     }
   };
+  
+  // Set units based on selected country
+  useEffect(() => {
+    if (locationName) {
+      // Check if the location contains "United States" to set imperial units
+      const isUS = locationName.toLowerCase().includes('united states');
+      setUseMetric(!isUS); // Use imperial (false) for US, metric (true) for others
+    }
+  }, [locationName]);
 
   return (
     <>
@@ -103,7 +113,11 @@ function ManualLocationPage() {
             hfiError={hfiError}
           />
           
-          <WeatherDisplay weatherData={weatherData} />
+          <WeatherDisplay 
+            weatherData={weatherData} 
+            useMetric={useMetric}
+            onToggleUnits={() => setUseMetric(!useMetric)}
+          />
         </div>
       )}
     </>

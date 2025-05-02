@@ -1,28 +1,49 @@
 import React from 'react';
 
-const WeatherDisplay = ({ weatherData }) => {
+const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
   if (!weatherData || typeof weatherData !== 'object') return null;
   
   return (
     <div style={{ margin: '15px 0', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-      <h3 style={{ marginTop: '0', color: '#333' }}>Weather &amp; Hair Forecast</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+        <h3 style={{ marginTop: '0', marginBottom: '0', color: '#333' }}>Weather &amp; Hair Forecast</h3>
+        <button 
+          onClick={onToggleUnits}
+          style={{
+            padding: '5px 10px',
+            backgroundColor: '#fff',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '0.9em'
+          }}
+        >
+          {useMetric ? 'Switch to °F' : 'Switch to °C'}
+        </button>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
         {weatherData.temperature_f !== undefined && (
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Temperature</p>
-            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>{weatherData.temperature_f}°F</p>
+            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
+              {useMetric ? `${weatherData.temperature_c}°C` : `${weatherData.temperature_f}°F`}
+            </p>
           </div>
         )}
         {weatherData.dewpoint_f !== undefined && (
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Dewpoint</p>
-            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>{weatherData.dewpoint_f}°F</p>
+            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
+              {useMetric ? `${weatherData.dewpoint_c}°C` : `${weatherData.dewpoint_f}°F`}
+            </p>
           </div>
         )}
         {weatherData.wind_mph !== undefined && (
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Wind Speed</p>
-            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>{weatherData.wind_mph} mph</p>
+            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
+              {useMetric ? `${weatherData.wind_kph} km/h` : `${weatherData.wind_mph} mph`}
+            </p>
           </div>
         )}
       </div>

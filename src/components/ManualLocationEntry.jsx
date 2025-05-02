@@ -119,7 +119,8 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
       onLocationSubmit({
         displayName: locationString,
         latitude: city.latitude,
-        longitude: city.longitude
+        longitude: city.longitude,
+        country: selectedCountry.name
       });
     } else {
       // Fallback to just the string if no coordinates
