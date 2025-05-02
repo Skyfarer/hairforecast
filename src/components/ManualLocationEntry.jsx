@@ -143,7 +143,7 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
 
   return (
     <div>
-      <h2>Select Location</h2>
+      <h2>Hair Forecast</h2>
       
       {/* Country Selection */}
       <div style={{ marginBottom: '20px' }}>
