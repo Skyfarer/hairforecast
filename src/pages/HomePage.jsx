@@ -91,7 +91,7 @@ function HomePage() {
 
   return (
     <>
-      <h1>Location Finder</h1>
+      <h1>Hair Forecast</h1>
       
       <LocationFinder 
         loading={loading}
