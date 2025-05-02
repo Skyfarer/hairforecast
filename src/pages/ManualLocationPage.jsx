@@ -87,10 +87,12 @@ function ManualLocationPage() {
       <div style={{ margin: '20px 0' }}>
         <Link to="/" style={{ 
           padding: '8px 16px', 
-          backgroundColor: '#f0f0f0', 
+          backgroundColor: '#4CAF50',
+          color: 'white',
           borderRadius: '4px',
           textDecoration: 'none',
-          color: '#333'
+          fontWeight: 'bold',
+          display: 'inline-block'
         }}>
           Back to Home
         </Link>
