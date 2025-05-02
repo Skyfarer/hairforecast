@@ -17,11 +17,6 @@ const WeatherStatus = ({
         </div>
       )}
       
-      {geohash && (
-        <div style={{ margin: '15px 0', padding: '10px', backgroundColor: '#f0f8ff', borderRadius: '5px' }}>
-          <p><strong>Weather Location Geohash:</strong> {geohash}</p>
-        </div>
-      )}
       
       {hfiLoading && <p>Fetching Hair Forecast Index data...</p>}
       
