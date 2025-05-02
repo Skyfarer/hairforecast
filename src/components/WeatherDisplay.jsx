@@ -28,7 +28,9 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Temperature</p>
             <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
-              {useMetric ? `${weatherData.temperature_c}°C` : `${weatherData.temperature_f}°F`}
+              {useMetric 
+                ? (weatherData.temperature_c !== undefined ? `${weatherData.temperature_c}°C` : `${Math.round((weatherData.temperature_f - 32) * 5/9)}°C`) 
+                : `${weatherData.temperature_f}°F`}
             </p>
           </div>
         )}
@@ -36,7 +38,9 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Dewpoint</p>
             <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
-              {useMetric ? `${weatherData.dewpoint_c}°C` : `${weatherData.dewpoint_f}°F`}
+              {useMetric 
+                ? (weatherData.dewpoint_c !== undefined ? `${weatherData.dewpoint_c}°C` : `${Math.round((weatherData.dewpoint_f - 32) * 5/9)}°C`) 
+                : `${weatherData.dewpoint_f}°F`}
             </p>
           </div>
         )}
@@ -44,7 +48,9 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Wind Speed</p>
             <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
-              {useMetric ? `${weatherData.wind_kph} km/h` : `${weatherData.wind_mph} mph`}
+              {useMetric 
+                ? (weatherData.wind_kph !== undefined ? `${weatherData.wind_kph} km/h` : `${Math.round(weatherData.wind_mph * 1.60934)} km/h`) 
+                : `${weatherData.wind_mph} mph`}
             </p>
           </div>
         )}
