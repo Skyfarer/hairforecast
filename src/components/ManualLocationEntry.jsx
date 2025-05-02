@@ -52,14 +52,6 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
     return () => clearTimeout(debounceTimer);
   }, [countryInput]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (countryInput.trim()) {
-      onLocationSubmit(countryInput);
-      setShowSuggestions(false);
-    }
-  };
-
   const handleSuggestionClick = (country) => {
     setCountryInput(country.name);
     onLocationSubmit(country.name);
@@ -70,7 +62,7 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
     <div>
       <h2>Select a Country</h2>
       <div style={{ position: 'relative' }} ref={suggestionsRef}>
-        <form onSubmit={handleSubmit}>
+        <div>
           <input
             type="text"
             value={countryInput}
@@ -83,27 +75,12 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
             disabled={loading}
             style={{ 
               padding: '8px', 
-              marginRight: '10px', 
               width: '250px',
               borderRadius: '4px',
               border: '1px solid #ccc'
             }}
           />
-          <button 
-            type="submit" 
-            disabled={loading || !countryInput.trim()}
-            style={{ 
-              padding: '8px 16px',
-              borderRadius: '4px',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              cursor: loading || !countryInput.trim() ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {loading ? 'Loading...' : 'Search'}
-          </button>
-        </form>
+        </div>
         
         {showSuggestions && suggestions.length > 0 && (
           <ul style={{
