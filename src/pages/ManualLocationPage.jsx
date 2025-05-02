@@ -55,8 +55,19 @@ function ManualLocationPage() {
   };
 
   const handleLocationSubmit = (location) => {
-    setLocationName(location);
-    fetchNearbyGeohashWithState(location);
+    // If location is an object with coordinates and display name
+    if (location && typeof location === 'object' && location.displayName) {
+      setLocationName(location.displayName);
+      // Use coordinates for more accurate geohash lookup
+      fetchNearbyGeohashWithState({
+        latitude: location.latitude,
+        longitude: location.longitude
+      });
+    } else {
+      // Fallback to string-based lookup
+      setLocationName(location);
+      fetchNearbyGeohashWithState(location);
+    }
   };
 
   return (

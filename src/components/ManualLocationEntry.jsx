@@ -109,12 +109,22 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
     setCityInput(city.name);
     setShowCitySuggestions(false);
     
-    // Format the location with city, state (if available), and country
+    // Format the location with city, state (if available), and country for display
     const locationString = city.state_code 
       ? `${city.name}, ${city.state_code}, ${selectedCountry.name}`
       : `${city.name}, ${selectedCountry.name}`;
     
-    onLocationSubmit(locationString);
+    // Pass both the display name and coordinates if available
+    if (city.latitude && city.longitude) {
+      onLocationSubmit({
+        displayName: locationString,
+        latitude: city.latitude,
+        longitude: city.longitude
+      });
+    } else {
+      // Fallback to just the string if no coordinates
+      onLocationSubmit(locationString);
+    }
   };
 
   // Reset everything when changing country
