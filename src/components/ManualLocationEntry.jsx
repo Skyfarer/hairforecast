@@ -1,18 +1,29 @@
 import { useState, useEffect, useRef } from 'react';
-import { fetchCountries } from '../api/api';
+import { fetchCountries, fetchCities } from '../api/api';
 
 const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
   const [countryInput, setCountryInput] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [countrySuggestions, setCountrySuggestions] = useState([]);
+  const [showCountrySuggestions, setShowCountrySuggestions] = useState(false);
   const [fetchingCountries, setFetchingCountries] = useState(false);
-  const suggestionsRef = useRef(null);
+  
+  const [cityInput, setCityInput] = useState('');
+  const [citySuggestions, setCitySuggestions] = useState([]);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const [fetchingCities, setFetchingCities] = useState(false);
+  
+  const countrySuggestionsRef = useRef(null);
+  const citySuggestionsRef = useRef(null);
 
+  // Handle clicks outside of suggestion dropdowns
   useEffect(() => {
-    // Add click outside listener to close suggestions
     const handleClickOutside = (event) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
-        setShowSuggestions(false);
+      if (countrySuggestionsRef.current && !countrySuggestionsRef.current.contains(event.target)) {
+        setShowCountrySuggestions(false);
+      }
+      if (citySuggestionsRef.current && !citySuggestionsRef.current.contains(event.target)) {
+        setShowCitySuggestions(false);
       }
     };
 
@@ -22,10 +33,11 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
     };
   }, []);
 
+  // Fetch country suggestions when user types
   useEffect(() => {
     const fetchCountrySuggestions = async () => {
       if (countryInput.trim().length < 2) {
-        setSuggestions([]);
+        setCountrySuggestions([]);
         return;
       }
 
@@ -33,13 +45,13 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
       try {
         const data = await fetchCountries(countryInput);
         if (data && Array.isArray(data.countries)) {
-          setSuggestions(data.countries);
+          setCountrySuggestions(data.countries);
         } else {
-          setSuggestions([]);
+          setCountrySuggestions([]);
         }
       } catch (error) {
         console.error('Error fetching country suggestions:', error);
-        setSuggestions([]);
+        setCountrySuggestions([]);
       } finally {
         setFetchingCountries(false);
       }
@@ -52,25 +64,87 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
     return () => clearTimeout(debounceTimer);
   }, [countryInput]);
 
-  const handleSuggestionClick = (country) => {
+  // Fetch city suggestions when user types and a country is selected
+  useEffect(() => {
+    if (!selectedCountry) return;
+    
+    const fetchCitySuggestions = async () => {
+      if (cityInput.trim().length < 2) {
+        setCitySuggestions([]);
+        return;
+      }
+
+      setFetchingCities(true);
+      try {
+        const data = await fetchCities(selectedCountry.id, cityInput);
+        if (data && Array.isArray(data.cities)) {
+          setCitySuggestions(data.cities);
+        } else {
+          setCitySuggestions([]);
+        }
+      } catch (error) {
+        console.error('Error fetching city suggestions:', error);
+        setCitySuggestions([]);
+      } finally {
+        setFetchingCities(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      fetchCitySuggestions();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [cityInput, selectedCountry]);
+
+  const handleCountrySelect = (country) => {
     setCountryInput(country.name);
-    onLocationSubmit(country.name);
-    setShowSuggestions(false);
+    setSelectedCountry(country);
+    setShowCountrySuggestions(false);
+    setCityInput('');
+    setCitySuggestions([]);
+  };
+
+  const handleCitySelect = (city) => {
+    setCityInput(city.name);
+    setShowCitySuggestions(false);
+    
+    // Format the location with city, state (if available), and country
+    const locationString = city.state_code 
+      ? `${city.name}, ${city.state_code}, ${selectedCountry.name}`
+      : `${city.name}, ${selectedCountry.name}`;
+    
+    onLocationSubmit(locationString);
+  };
+
+  // Reset everything when changing country
+  const handleCountryInputChange = (e) => {
+    const value = e.target.value;
+    setCountryInput(value);
+    setShowCountrySuggestions(true);
+    
+    if (selectedCountry && value !== selectedCountry.name) {
+      setSelectedCountry(null);
+      setCityInput('');
+      setCitySuggestions([]);
+    }
   };
 
   return (
     <div>
-      <h2>Select a Country</h2>
-      <div style={{ position: 'relative' }} ref={suggestionsRef}>
-        <div>
+      <h2>Select Location</h2>
+      
+      {/* Country Selection */}
+      <div style={{ marginBottom: '20px' }}>
+        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+          Country:
+        </label>
+        <div style={{ position: 'relative' }} ref={countrySuggestionsRef}>
           <input
             type="text"
             value={countryInput}
-            onChange={(e) => {
-              setCountryInput(e.target.value);
-              setShowSuggestions(true);
-            }}
-            onFocus={() => setShowSuggestions(true)}
+            onChange={handleCountryInputChange}
+            onFocus={() => setShowCountrySuggestions(true)}
             placeholder="Start typing a country name"
             disabled={loading}
             style={{ 
@@ -80,49 +154,118 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
               border: '1px solid #ccc'
             }}
           />
+          
+          {showCountrySuggestions && countrySuggestions.length > 0 && (
+            <ul style={{
+              position: 'absolute',
+              width: '250px',
+              maxHeight: '200px',
+              overflowY: 'auto',
+              listStyle: 'none',
+              padding: '0',
+              margin: '0',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              backgroundColor: 'white',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              zIndex: 10
+            }}>
+              {countrySuggestions.map((country, index) => (
+                <li 
+                  key={index}
+                  onClick={() => handleCountrySelect(country)}
+                  style={{
+                    padding: '8px 12px',
+                    cursor: 'pointer',
+                    color: '#333',
+                    backgroundColor: 'white',
+                    borderBottom: index < countrySuggestions.length - 1 ? '1px solid #eee' : 'none'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                >
+                  {country.name}
+                </li>
+              ))}
+            </ul>
+          )}
+          
+          {fetchingCountries && (
+            <div style={{ marginTop: '8px', color: '#666' }}>
+              Loading countries...
+            </div>
+          )}
         </div>
-        
-        {showSuggestions && suggestions.length > 0 && (
-          <ul style={{
-            position: 'absolute',
-            width: '250px',
-            maxHeight: '200px',
-            overflowY: 'auto',
-            listStyle: 'none',
-            padding: '0',
-            margin: '0',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            backgroundColor: 'white',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            zIndex: 10
-          }}>
-            {suggestions.map((country, index) => (
-              <li 
-                key={index}
-                onClick={() => handleSuggestionClick(country)}
-                style={{
-                  padding: '8px 12px',
-                  cursor: 'pointer',
-                  color: '#333',
-                  backgroundColor: 'white',
-                  borderBottom: index < suggestions.length - 1 ? '1px solid #eee' : 'none'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-              >
-                {country.name}
-              </li>
-            ))}
-          </ul>
-        )}
-        
-        {fetchingCountries && (
-          <div style={{ marginTop: '8px', color: '#666' }}>
-            Loading suggestions...
-          </div>
-        )}
       </div>
+      
+      {/* City Selection - Only show when a country is selected */}
+      {selectedCountry && (
+        <div>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            City:
+          </label>
+          <div style={{ position: 'relative' }} ref={citySuggestionsRef}>
+            <input
+              type="text"
+              value={cityInput}
+              onChange={(e) => {
+                setCityInput(e.target.value);
+                setShowCitySuggestions(true);
+              }}
+              onFocus={() => setShowCitySuggestions(true)}
+              placeholder={`Start typing a city in ${selectedCountry.name}`}
+              disabled={loading}
+              style={{ 
+                padding: '8px', 
+                width: '250px',
+                borderRadius: '4px',
+                border: '1px solid #ccc'
+              }}
+            />
+            
+            {showCitySuggestions && citySuggestions.length > 0 && (
+              <ul style={{
+                position: 'absolute',
+                width: '250px',
+                maxHeight: '200px',
+                overflowY: 'auto',
+                listStyle: 'none',
+                padding: '0',
+                margin: '0',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                backgroundColor: 'white',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                zIndex: 10
+              }}>
+                {citySuggestions.map((city, index) => (
+                  <li 
+                    key={index}
+                    onClick={() => handleCitySelect(city)}
+                    style={{
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      color: '#333',
+                      backgroundColor: 'white',
+                      borderBottom: index < citySuggestions.length - 1 ? '1px solid #eee' : 'none'
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                  >
+                    {city.name}{city.state_code ? `, ${city.state_code}` : ''}
+                  </li>
+                ))}
+              </ul>
+            )}
+            
+            {fetchingCities && (
+              <div style={{ marginTop: '8px', color: '#666' }}>
+                Loading cities...
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

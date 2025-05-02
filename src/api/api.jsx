@@ -76,3 +76,26 @@ export const fetchCountries = async (query = '') => {
     throw error;
   }
 };
+
+/**
+ * Fetches cities list for a specific country with optional search query
+ * @param {string} countryId - The country ID to fetch cities for
+ * @param {string} query - Optional search query to filter cities
+ * @returns {Promise} - Promise that resolves to the cities data
+ */
+export const fetchCities = async (countryId, query = '') => {
+  try {
+    const url = `/geoapi/cities?country_id=${encodeURIComponent(countryId)}${query ? `&q=${encodeURIComponent(query)}` : ''}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch cities: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Cities API response:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching cities:', error);
+    throw error;
+  }
+};

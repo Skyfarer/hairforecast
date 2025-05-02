@@ -61,7 +61,7 @@ function ManualLocationPage() {
 
   return (
     <>
-      <h1>Country Weather Lookup</h1>
+      <h1>Location Weather Lookup</h1>
       
       <div style={{ margin: '20px 0' }}>
         <Link to="/" style={{ 
