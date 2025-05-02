@@ -127,6 +127,8 @@ const ManualLocationEntry = ({ onLocationSubmit, loading }) => {
                 style={{
                   padding: '8px 12px',
                   cursor: 'pointer',
+                  color: '#333',
+                  backgroundColor: 'white',
                   borderBottom: index < suggestions.length - 1 ? '1px solid #eee' : 'none'
                 }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
