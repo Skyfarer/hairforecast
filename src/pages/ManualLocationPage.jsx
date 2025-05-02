@@ -92,13 +92,10 @@ function ManualLocationPage() {
           borderRadius: '4px',
           textDecoration: 'none',
           fontWeight: 'bold',
-          display: 'inline-block',
-          marginRight: '20px'
+          display: 'inline-block'
         }}>
           Back to Home
         </Link>
-        
-        <h2 style={{ margin: '0' }}>Hair Forecast</h2>
       </div>
       
       <ManualLocationEntry 
