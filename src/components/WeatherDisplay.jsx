@@ -10,19 +10,19 @@ const WeatherDisplay = ({ weatherData }) => {
         {weatherData.temperature_f !== undefined && (
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Temperature</p>
-            <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.temperature_f}°F</p>
+            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>{weatherData.temperature_f}°F</p>
           </div>
         )}
         {weatherData.dewpoint_f !== undefined && (
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Dewpoint</p>
-            <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.dewpoint_f}°F</p>
+            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>{weatherData.dewpoint_f}°F</p>
           </div>
         )}
         {weatherData.wind_mph !== undefined && (
           <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Wind Speed</p>
-            <p style={{ fontSize: '1.2em', margin: '0' }}>{weatherData.wind_mph} mph</p>
+            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>{weatherData.wind_mph} mph</p>
           </div>
         )}
       </div>
