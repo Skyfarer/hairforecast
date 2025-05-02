@@ -7,7 +7,6 @@ const LocationFinder = ({
 }) => {
   return (
     <div className="card">
-      <h2>Geolocation</h2>
       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px' }}>
         <button onClick={getLocation} disabled={loading}>
           {loading ? 'Getting location...' : 'Get My Location'}
