@@ -82,7 +82,7 @@ function ManualLocationPage() {
 
   return (
     <>
-      <h1>Location Weather Lookup</h1>
+      <h1>Hair Forecast</h1>
       
       <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
         <Link to="/" style={{ 
