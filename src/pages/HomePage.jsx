@@ -25,7 +25,8 @@ function HomePage() {
     setWeatherData(null);
     
     try {
-      const data = await fetchHfiData(geohash);
+      // Fetch data for multiple intervals: 0h, 6h, 12h, 18h
+      const data = await fetchHfiData(geohash, ['0h', '6h', '12h', '18h']);
       setWeatherData(data);
     } catch (error) {
       setHfiError(`Failed to fetch HFI data: ${error.message}`);
