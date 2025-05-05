@@ -181,7 +181,6 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
             <tr style={{ backgroundColor: '#f0f0f0' }}>
               <th style={{ padding: '12px 15px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Time</th>
               <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>Temperature</th>
-              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>Dewpoint</th>
               <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>Wind Speed</th>
               <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>HFI</th>
               <th style={{ padding: '12px 15px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Hair Day Quality</th>
@@ -207,9 +206,6 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
                   </td>
                   <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
                     {getTemperature(data)}
-                  </td>
-                  <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                    {getDewpoint(data)}
                   </td>
                   <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
                     {getWindSpeed(data)}
