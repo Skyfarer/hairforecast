@@ -83,12 +83,12 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
     
     return useMetric 
       ? (tempC !== undefined 
-          ? `${tempC}°C` 
+          ? `${Math.round(tempC)}°C` 
           : tempF !== undefined 
             ? `${Math.round((tempF - 32) * 5/9)}°C`
             : 'N/A') 
       : tempF !== undefined 
-        ? `${tempF}°F`
+        ? `${Math.round(tempF)}°F`
         : 'N/A';
   };
 
@@ -108,12 +108,12 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
     
     return useMetric 
       ? (dewpointC !== undefined 
-          ? `${dewpointC}°C` 
+          ? `${Math.round(dewpointC)}°C` 
           : dewpointF !== undefined 
             ? `${Math.round((dewpointF - 32) * 5/9)}°C`
             : 'N/A') 
       : dewpointF !== undefined 
-        ? `${dewpointF}°F`
+        ? `${Math.round(dewpointF)}°F`
         : 'N/A';
   };
 
