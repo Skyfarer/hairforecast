@@ -70,42 +70,75 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
   // Get temperature display value
   const getTemperature = (data) => {
     if (!data) return 'N/A';
+    
+    // Check if temperature is directly in the data object
+    let tempF = data.temperature_f;
+    let tempC = data.temperature_c;
+    
+    // If not, check if it's in a nested 'temperature' object
+    if (tempF === undefined && data.temperature && typeof data.temperature === 'object') {
+      tempF = data.temperature.f;
+      tempC = data.temperature.c;
+    }
+    
     return useMetric 
-      ? (data.temperature_c !== undefined 
-          ? `${data.temperature_c}°C` 
-          : data.temperature_f !== undefined 
-            ? `${Math.round((data.temperature_f - 32) * 5/9)}°C`
+      ? (tempC !== undefined 
+          ? `${tempC}°C` 
+          : tempF !== undefined 
+            ? `${Math.round((tempF - 32) * 5/9)}°C`
             : 'N/A') 
-      : data.temperature_f !== undefined 
-        ? `${data.temperature_f}°F`
+      : tempF !== undefined 
+        ? `${tempF}°F`
         : 'N/A';
   };
 
   // Get dewpoint display value
   const getDewpoint = (data) => {
     if (!data) return 'N/A';
+    
+    // Check if dewpoint is directly in the data object
+    let dewpointF = data.dewpoint_f;
+    let dewpointC = data.dewpoint_c;
+    
+    // If not, check if it's in a nested 'dewpoint' object
+    if (dewpointF === undefined && data.dewpoint && typeof data.dewpoint === 'object') {
+      dewpointF = data.dewpoint.f;
+      dewpointC = data.dewpoint.c;
+    }
+    
     return useMetric 
-      ? (data.dewpoint_c !== undefined 
-          ? `${data.dewpoint_c}°C` 
-          : data.dewpoint_f !== undefined 
-            ? `${Math.round((data.dewpoint_f - 32) * 5/9)}°C`
+      ? (dewpointC !== undefined 
+          ? `${dewpointC}°C` 
+          : dewpointF !== undefined 
+            ? `${Math.round((dewpointF - 32) * 5/9)}°C`
             : 'N/A') 
-      : data.dewpoint_f !== undefined 
-        ? `${data.dewpoint_f}°F`
+      : dewpointF !== undefined 
+        ? `${dewpointF}°F`
         : 'N/A';
   };
 
   // Get wind speed display value
   const getWindSpeed = (data) => {
     if (!data) return 'N/A';
+    
+    // Check if wind speed is directly in the data object
+    let windMph = data.wind_mph;
+    let windKph = data.wind_kph;
+    
+    // If not, check if it's in a nested 'wind' object
+    if (windMph === undefined && data.wind && typeof data.wind === 'object') {
+      windMph = data.wind.mph;
+      windKph = data.wind.kph;
+    }
+    
     return useMetric 
-      ? (data.wind_kph !== undefined 
-          ? `${data.wind_kph} km/h` 
-          : data.wind_mph !== undefined 
-            ? `${Math.round(data.wind_mph * 1.60934)} km/h`
+      ? (windKph !== undefined 
+          ? `${windKph} km/h` 
+          : windMph !== undefined 
+            ? `${Math.round(windMph * 1.60934)} km/h`
             : 'N/A') 
-      : data.wind_mph !== undefined 
-        ? `${data.wind_mph} mph`
+      : windMph !== undefined 
+        ? `${windMph} mph`
         : 'N/A';
   };
 
@@ -116,6 +149,9 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
 
   // Get first 8 intervals or all if less than 8
   const displayIntervals = sortedIntervals.slice(0, 8);
+  
+  console.log('Display intervals:', displayIntervals);
+  console.log('Sample data for first interval:', weatherData[displayIntervals[0]]);
 
   return (
     <div style={{ margin: '15px 0', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
@@ -154,7 +190,9 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
           <tbody>
             {displayIntervals.map(interval => {
               const data = weatherData[interval];
-              const hfi = data.hfi !== undefined ? data.hfi : null;
+              // Check if HFI is directly in the data object or in a nested object
+              const hfi = data.hfi !== undefined ? data.hfi : 
+                         (data.hair_forecast_index !== undefined ? data.hair_forecast_index : null);
               const colors = hfi !== null ? getHfiColor(hfi) : { bg: '#f9f9f9', text: '#666', border: '#ddd' };
               
               return (
@@ -209,7 +247,7 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
       </div>
       
       {/* Detailed HFI display for selected interval */}
-      {currentData.hfi !== undefined && (
+      {(currentData.hfi !== undefined || currentData.hair_forecast_index !== undefined) && (
         <div style={{ 
           marginTop: '20px', 
           padding: '15px', 
@@ -222,7 +260,7 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
             Hair Forecast Details - {formatInterval(validInterval.replace('h', ''))}
           </h4>
           <p style={{ color: '#666', margin: '10px 0' }}>
-            {getHfiDescription(currentData.hfi)}
+            {getHfiDescription(currentData.hfi !== undefined ? currentData.hfi : currentData.hair_forecast_index)}
           </p>
         </div>
       )}

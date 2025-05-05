@@ -14,6 +14,22 @@ export const fetchHfiData = async (geohash) => {
     
     const data = await response.json();
     console.log('HFI API response:', data);
+    console.log('HFI API response type:', typeof data);
+    console.log('HFI API response keys:', Object.keys(data));
+    
+    // Log the first level of nested objects/arrays
+    Object.keys(data).forEach(key => {
+      const value = data[key];
+      console.log(`Key ${key} type:`, typeof value);
+      if (Array.isArray(value)) {
+        console.log(`Key ${key} is array with ${value.length} items`);
+        if (value.length > 0) {
+          console.log(`First item in ${key}:`, value[0]);
+        }
+      } else if (typeof value === 'object' && value !== null) {
+        console.log(`Key ${key} object keys:`, Object.keys(value));
+      }
+    });
     
     // Format the data into an object with intervals as keys for backward compatibility
     const formattedData = {};
@@ -25,9 +41,31 @@ export const fetchHfiData = async (geohash) => {
         const hourOffset = index * 6;
         formattedData[`${hourOffset}h`] = forecast;
       });
+    } else if (data && data.forecast && Array.isArray(data.forecast)) {
+      // Alternative API format with 'forecast' property
+      data.forecast.forEach((forecast, index) => {
+        const hourOffset = index * 6;
+        formattedData[`${hourOffset}h`] = forecast;
+      });
     } else if (data && typeof data === 'object') {
       // If the API returns a single forecast object instead of an array
-      formattedData['0h'] = data;
+      // Check if this is the entire forecast object or just one entry
+      if (data.hfi !== undefined || data.temperature_f !== undefined) {
+        formattedData['0h'] = data;
+      } else {
+        // Try to extract forecast data from other possible structures
+        const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
+        if (possibleArrays.length > 0) {
+          // Use the first array found
+          possibleArrays[0].forEach((forecast, index) => {
+            const hourOffset = index * 6;
+            formattedData[`${hourOffset}h`] = forecast;
+          });
+        } else {
+          // Last resort: just use the first entry
+          formattedData['0h'] = data;
+        }
+      }
     }
     
     console.log('Formatted weather data:', formattedData);
