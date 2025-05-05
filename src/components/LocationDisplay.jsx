@@ -5,9 +5,6 @@ const LocationDisplay = ({ location }) => {
   
   return (
     <div>
-      <p>Your coordinates:</p>
-      <p>Latitude: {location.latitude}</p>
-      <p>Longitude: {location.longitude}</p>
       <p>
         <a 
           href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
