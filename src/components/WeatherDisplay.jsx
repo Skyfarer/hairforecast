@@ -3,15 +3,36 @@ import React, { useState } from 'react';
 const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
   const [selectedInterval, setSelectedInterval] = useState('0h');
   
-  if (!weatherData || typeof weatherData !== 'object') return null;
+  console.log('WeatherDisplay received data:', weatherData);
+  
+  if (!weatherData || typeof weatherData !== 'object') {
+    console.log('No weather data or invalid format');
+    return <div>No weather data available</div>;
+  }
   
   // Get available intervals
   const intervals = Object.keys(weatherData);
-  if (intervals.length === 0) return null;
+  console.log('Available intervals:', intervals);
+  
+  if (intervals.length === 0) {
+    console.log('No intervals found in weather data');
+    return <div>No forecast intervals available</div>;
+  }
+  
+  // Make sure selectedInterval exists in the data, otherwise use the first available
+  const validInterval = intervals.includes(selectedInterval) ? selectedInterval : intervals[0];
+  if (validInterval !== selectedInterval) {
+    setSelectedInterval(validInterval);
+  }
   
   // Get data for the selected interval
-  const currentData = weatherData[selectedInterval];
-  if (!currentData) return null;
+  const currentData = weatherData[validInterval];
+  console.log('Current interval data:', validInterval, currentData);
+  
+  if (!currentData) {
+    console.log('No data for selected interval:', validInterval);
+    return <div>No data available for the selected time period</div>;
+  }
   
   // Convert interval to readable time format
   const formatInterval = (interval) => {
@@ -118,75 +139,97 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
       
       {/* Weather data for selected interval */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-        {currentData.temperature_f !== undefined && (
-          <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Temperature</p>
-            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
-              {useMetric 
-                ? (currentData.temperature_c !== undefined ? `${currentData.temperature_c}°C` : `${Math.round((currentData.temperature_f - 32) * 5/9)}°C`) 
-                : `${currentData.temperature_f}°F`}
-            </p>
-          </div>
-        )}
-        {currentData.dewpoint_f !== undefined && (
-          <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Dewpoint</p>
-            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
-              {useMetric 
-                ? (currentData.dewpoint_c !== undefined ? `${currentData.dewpoint_c}°C` : `${Math.round((currentData.dewpoint_f - 32) * 5/9)}°C`) 
-                : `${currentData.dewpoint_f}°F`}
-            </p>
-          </div>
-        )}
-        {currentData.wind_mph !== undefined && (
-          <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Wind Speed</p>
-            <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
-              {useMetric 
-                ? (currentData.wind_kph !== undefined ? `${currentData.wind_kph} km/h` : `${Math.round(currentData.wind_mph * 1.60934)} km/h`) 
-                : `${currentData.wind_mph} mph`}
-            </p>
-          </div>
-        )}
+        {/* Temperature */}
+        <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Temperature</p>
+          <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
+            {useMetric 
+              ? (currentData.temperature_c !== undefined 
+                  ? `${currentData.temperature_c}°C` 
+                  : currentData.temperature_f !== undefined 
+                    ? `${Math.round((currentData.temperature_f - 32) * 5/9)}°C`
+                    : 'N/A') 
+              : currentData.temperature_f !== undefined 
+                ? `${currentData.temperature_f}°F`
+                : 'N/A'}
+          </p>
+        </div>
+        
+        {/* Dewpoint */}
+        <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Dewpoint</p>
+          <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
+            {useMetric 
+              ? (currentData.dewpoint_c !== undefined 
+                  ? `${currentData.dewpoint_c}°C` 
+                  : currentData.dewpoint_f !== undefined 
+                    ? `${Math.round((currentData.dewpoint_f - 32) * 5/9)}°C`
+                    : 'N/A') 
+              : currentData.dewpoint_f !== undefined 
+                ? `${currentData.dewpoint_f}°F`
+                : 'N/A'}
+          </p>
+        </div>
+        
+        {/* Wind Speed */}
+        <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#555' }}>Wind Speed</p>
+          <p style={{ fontSize: '1.2em', margin: '0', color: '#333' }}>
+            {useMetric 
+              ? (currentData.wind_kph !== undefined 
+                  ? `${currentData.wind_kph} km/h` 
+                  : currentData.wind_mph !== undefined 
+                    ? `${Math.round(currentData.wind_mph * 1.60934)} km/h`
+                    : 'N/A') 
+              : currentData.wind_mph !== undefined 
+                ? `${currentData.wind_mph} mph`
+                : 'N/A'}
+          </p>
+        </div>
       </div>
       
       {/* HFI display for selected interval */}
-      {currentData.hfi !== undefined && (
-        <div style={{ 
-          marginTop: '15px', 
-          padding: '15px', 
-          backgroundColor: getHfiColor(currentData.hfi).bg,
-          borderRadius: '4px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          borderLeft: `4px solid ${getHfiColor(currentData.hfi).border}`
-        }}>
-          <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>
-            Hair Forecast Index (HFI) - {formatInterval(selectedInterval.replace('h', ''))}
-          </h4>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ 
-              fontSize: '2em', 
-              fontWeight: 'bold',
-              color: getHfiColor(currentData.hfi).text
-            }}>
-              {currentData.hfi}
-            </span>
-            <span style={{ 
-              padding: '5px 10px', 
-              borderRadius: '15px',
-              backgroundColor: getHfiColor(currentData.hfi).bg,
-              color: getHfiColor(currentData.hfi).text,
-              fontWeight: 'bold',
-              border: `1px solid ${getHfiColor(currentData.hfi).border}`
-            }}>
-              {getHfiStatus(currentData.hfi)}
-            </span>
-          </div>
-          <p style={{ marginTop: '10px', color: '#666' }}>
-            {getHfiDescription(currentData.hfi)}
-          </p>
-        </div>
-      )}
+      <div style={{ 
+        marginTop: '15px', 
+        padding: '15px', 
+        backgroundColor: currentData.hfi !== undefined ? getHfiColor(currentData.hfi).bg : '#f9f9f9',
+        borderRadius: '4px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        borderLeft: currentData.hfi !== undefined ? `4px solid ${getHfiColor(currentData.hfi).border}` : '4px solid #ddd'
+      }}>
+        <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>
+          Hair Forecast Index (HFI) - {formatInterval(validInterval.replace('h', ''))}
+        </h4>
+        
+        {currentData.hfi !== undefined ? (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ 
+                fontSize: '2em', 
+                fontWeight: 'bold',
+                color: getHfiColor(currentData.hfi).text
+              }}>
+                {currentData.hfi}
+              </span>
+              <span style={{ 
+                padding: '5px 10px', 
+                borderRadius: '15px',
+                backgroundColor: getHfiColor(currentData.hfi).bg,
+                color: getHfiColor(currentData.hfi).text,
+                fontWeight: 'bold',
+                border: `1px solid ${getHfiColor(currentData.hfi).border}`
+              }}>
+                {getHfiStatus(currentData.hfi)}
+              </span>
+            </div>
+            <p style={{ marginTop: '10px', color: '#666' }}>
+              {getHfiDescription(currentData.hfi)}
+            </p>
+          </>
+        ) : (
+          <p style={{ color: '#666' }}>HFI data not available for this time period</p>
+        )}
+      </div>
     </div>
   );
 };

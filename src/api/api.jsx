@@ -25,8 +25,12 @@ export const fetchHfiData = async (geohash) => {
         const hourOffset = index * 6;
         formattedData[`${hourOffset}h`] = forecast;
       });
+    } else if (data && typeof data === 'object') {
+      // If the API returns a single forecast object instead of an array
+      formattedData['0h'] = data;
     }
     
+    console.log('Formatted weather data:', formattedData);
     return formattedData;
   } catch (error) {
     console.error('Error fetching HFI data:', error);
