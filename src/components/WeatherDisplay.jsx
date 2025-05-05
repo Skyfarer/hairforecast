@@ -17,10 +17,12 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
   const formatInterval = (interval) => {
     const hours = parseInt(interval);
     if (hours === 0) return 'Now';
-    if (hours === 6) return '+6 hours';
-    if (hours === 12) return '+12 hours';
-    if (hours === 18) return '+18 hours';
-    return `+${hours} hours`;
+    if (hours <= 24) return `+${hours} hours`;
+    // For intervals beyond 24 hours, show days
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+    if (remainingHours === 0) return `+${days} day${days > 1 ? 's' : ''}`;
+    return `+${days}d ${remainingHours}h`;
   };
   
   // Get background color based on HFI value

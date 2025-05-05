@@ -1,34 +1,33 @@
 // API functions for weather and geo data
 
 /**
- * Fetches HFI (Hair Forecast Index) data using a geohash for multiple intervals
+ * Fetches HFI (Hair Forecast Index) data using a geohash
  * @param {string} geohash - The geohash location code
- * @param {Array} intervals - Array of intervals to fetch (e.g. ['0h', '6h', '12h', '18h'])
- * @returns {Promise} - Promise that resolves to an object with interval data
+ * @returns {Promise} - Promise that resolves to an object with forecast data for the next 48 hours
  */
-export const fetchHfiData = async (geohash, intervals = ['0h', '6h', '12h', '18h']) => {
+export const fetchHfiData = async (geohash) => {
   try {
-    // Create an object to store all interval data
-    const allIntervalData = {};
+    const response = await fetch(`/wxapi/hfi?geohash=${geohash}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch HFI data: ${response.status} ${response.statusText}`);
+    }
     
-    // Fetch data for each interval
-    const promises = intervals.map(async (interval) => {
-      const response = await fetch(`/wxapi/hfi?interval=${interval}&geohash=${geohash}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch HFI data for interval ${interval}: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log(`HFI API response for interval ${interval}:`, data);
-      
-      // Store the data with the interval as the key
-      allIntervalData[interval] = data;
-    });
+    const data = await response.json();
+    console.log('HFI API response:', data);
     
-    // Wait for all requests to complete
-    await Promise.all(promises);
+    // Format the data into an object with intervals as keys for backward compatibility
+    const formattedData = {};
     
-    return allIntervalData;
+    // The API now returns an array of forecasts at 6-hour intervals
+    if (data && Array.isArray(data.forecasts)) {
+      data.forecasts.forEach((forecast, index) => {
+        // Use the hour offset as the key (0h, 6h, 12h, etc.)
+        const hourOffset = index * 6;
+        formattedData[`${hourOffset}h`] = forecast;
+      });
+    }
+    
+    return formattedData;
   } catch (error) {
     console.error('Error fetching HFI data:', error);
     throw error;
