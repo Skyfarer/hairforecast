@@ -123,8 +123,6 @@ function HomePage() {
       
       {location && (
         <div>
-          <LocationDisplay location={location} />
-          
           <WeatherStatus 
             wxApiLoading={wxApiLoading}
             wxApiError={wxApiError}
