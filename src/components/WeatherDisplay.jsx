@@ -153,10 +153,37 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
   console.log('Display intervals:', displayIntervals);
   console.log('Sample data for first interval:', weatherData[displayIntervals[0]]);
 
+  // Detect dark mode using CSS media query
+  const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  // Define color schemes for light and dark modes
+  const colors = {
+    background: prefersDarkMode ? '#2a2a2a' : '#f5f5f5',
+    cardBackground: prefersDarkMode ? '#333' : 'white',
+    headerBackground: prefersDarkMode ? '#222' : '#f0f0f0',
+    text: prefersDarkMode ? '#e0e0e0' : '#333',
+    border: prefersDarkMode ? '#444' : '#ddd',
+    shadow: prefersDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.1)'
+  };
+  
+  // Adjust HFI colors for dark mode
+  const getHfiColorAdjusted = (hfi) => {
+    const baseColors = getHfiColor(hfi);
+    
+    if (prefersDarkMode) {
+      // Darker versions of the colors for dark mode
+      if (hfi >= 8) return { bg: '#0a3049', border: '#1890ff', text: '#61dafb' }; // Blue
+      if (hfi >= 5) return { bg: '#3e2e00', border: '#faad14', text: '#ffd666' }; // Yellow/Orange
+      return { bg: '#3b0000', border: '#f5222d', text: '#ff7875' }; // Red
+    }
+    
+    return baseColors;
+  };
+
   return (
-    <div style={{ margin: '15px 0', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+    <div style={{ margin: '15px 0', padding: '15px', backgroundColor: colors.background, borderRadius: '5px', boxShadow: colors.shadow }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-        <h3 style={{ marginTop: '0', marginBottom: '0', color: '#333' }}>Weather &amp; Hair Forecast</h3>
+        <h3 style={{ marginTop: '0', marginBottom: '0', color: colors.text }}>Weather &amp; Hair Forecast</h3>
         <button 
           onClick={onToggleUnits}
           style={{
@@ -176,14 +203,14 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
       
       {/* Forecast table */}
       <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white', borderRadius: '4px', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: colors.cardBackground, borderRadius: '4px', overflow: 'hidden' }}>
           <thead>
-            <tr style={{ backgroundColor: '#f0f0f0' }}>
-              <th style={{ padding: '12px 15px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Time</th>
-              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>Temperature</th>
-              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>Wind Speed</th>
-              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>HFI</th>
-              <th style={{ padding: '12px 15px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Hair Day Quality</th>
+            <tr style={{ backgroundColor: colors.headerBackground }}>
+              <th style={{ padding: '12px 15px', textAlign: 'left', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Time</th>
+              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Temperature</th>
+              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Wind Speed</th>
+              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>HFI</th>
+              <th style={{ padding: '12px 15px', textAlign: 'left', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Hair Day Quality</th>
             </tr>
           </thead>
           <tbody>
@@ -192,42 +219,42 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
               // Check if HFI is directly in the data object or in a nested object
               const hfi = data.hfi !== undefined ? data.hfi : 
                          (data.hair_forecast_index !== undefined ? data.hair_forecast_index : null);
-              const colors = hfi !== null ? getHfiColor(hfi) : { bg: '#f9f9f9', text: '#666', border: '#ddd' };
+              const hfiColors = hfi !== null ? getHfiColorAdjusted(hfi) : { bg: prefersDarkMode ? '#2a2a2a' : '#f9f9f9', text: prefersDarkMode ? '#aaa' : '#666', border: colors.border };
               
               return (
                 <tr key={interval} 
                     style={{ 
-                      backgroundColor: interval === selectedInterval ? colors.bg : 'white',
+                      backgroundColor: interval === selectedInterval ? hfiColors.bg : colors.cardBackground,
                       cursor: 'pointer'
                     }}
                     onClick={() => setSelectedInterval(interval)}>
-                  <td style={{ padding: '12px 15px', borderBottom: '1px solid #ddd', fontWeight: interval === selectedInterval ? 'bold' : 'normal' }}>
+                  <td style={{ padding: '12px 15px', borderBottom: `1px solid ${colors.border}`, fontWeight: interval === selectedInterval ? 'bold' : 'normal', color: colors.text }}>
                     {formatInterval(interval.replace('h', ''))}
                   </td>
-                  <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
+                  <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>
                     {getTemperature(data)}
                   </td>
-                  <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
+                  <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>
                     {getWindSpeed(data)}
                   </td>
                   <td style={{ 
                     padding: '12px 15px', 
                     textAlign: 'center', 
-                    borderBottom: '1px solid #ddd',
+                    borderBottom: `1px solid ${colors.border}`,
                     fontWeight: 'bold',
-                    color: hfi !== null ? colors.text : '#666'
+                    color: hfi !== null ? hfiColors.text : (prefersDarkMode ? '#aaa' : '#666')
                   }}>
                     {hfi !== null ? hfi : 'N/A'}
                   </td>
-                  <td style={{ padding: '12px 15px', borderBottom: '1px solid #ddd' }}>
+                  <td style={{ padding: '12px 15px', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>
                     {hfi !== null ? (
                       <span style={{ 
                         padding: '4px 8px', 
                         borderRadius: '12px',
-                        backgroundColor: colors.bg,
-                        color: colors.text,
+                        backgroundColor: hfiColors.bg,
+                        color: hfiColors.text,
                         fontWeight: 'bold',
-                        border: `1px solid ${colors.border}`,
+                        border: `1px solid ${hfiColors.border}`,
                         fontSize: '0.9em',
                         whiteSpace: 'nowrap'
                       }}>
@@ -247,15 +274,15 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
         <div style={{ 
           marginTop: '20px', 
           padding: '15px', 
-          backgroundColor: getHfiColor(currentData.hfi).bg,
+          backgroundColor: getHfiColorAdjusted(currentData.hfi).bg,
           borderRadius: '4px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          borderLeft: `4px solid ${getHfiColor(currentData.hfi).border}`
+          boxShadow: prefersDarkMode ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.1)',
+          borderLeft: `4px solid ${getHfiColorAdjusted(currentData.hfi).border}`
         }}>
-          <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>
+          <h4 style={{ margin: '0 0 10px 0', color: getHfiColorAdjusted(currentData.hfi).text }}>
             Hair Forecast Details - {formatInterval(validInterval.replace('h', ''))}
           </h4>
-          <p style={{ color: '#666', margin: '10px 0' }}>
+          <p style={{ color: prefersDarkMode ? '#bbb' : '#666', margin: '10px 0' }}>
             {getHfiDescription(currentData.hfi !== undefined ? currentData.hfi : currentData.hair_forecast_index)}
           </p>
         </div>
