@@ -7,13 +7,19 @@
  */
 export const fetchHfiSummary = async (geohash) => {
   try {
-    const response = await fetch(`/wxapi/hfi-summary?geohash=${geohash}`);
+    console.log('Fetching HFI summary with geohash:', geohash);
+    const url = `/wxapi/hfi-summary?geohash=${geohash}`;
+    console.log('HFI Summary API URL:', url);
+    
+    const response = await fetch(url);
+    console.log('HFI Summary API response status:', response.status);
+    
     if (!response.ok) {
       throw new Error(`Failed to fetch HFI summary: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
-    console.log('HFI Summary API response:', data);
+    console.log('HFI Summary API response data:', data);
     return data;
   } catch (error) {
     console.error('Error fetching HFI summary:', error);

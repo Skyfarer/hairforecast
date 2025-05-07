@@ -155,20 +155,22 @@ function HomePage() {
             hfiError={hfiError}
           />
           
-          <WeatherDisplay 
-            weatherData={weatherData}
-            summaryData={summaryData}
-            useMetric={useMetric}
-            onToggleUnits={() => setUseMetric(!useMetric)}
-            showDetailView={showDetailView}
-            onToggleView={() => {
-              setShowDetailView(!showDetailView);
-              // If switching to detail view and we don't have detailed data yet, fetch it
-              if (!showDetailView && !weatherData && geohash) {
-                fetchHfiDataWithState(geohash);
-              }
-            }}
-          />
+          {(summaryData || weatherData) && (
+            <WeatherDisplay 
+              weatherData={weatherData}
+              summaryData={summaryData}
+              useMetric={useMetric}
+              onToggleUnits={() => setUseMetric(!useMetric)}
+              showDetailView={showDetailView}
+              onToggleView={() => {
+                setShowDetailView(!showDetailView);
+                // If switching to detail view and we don't have detailed data yet, fetch it
+                if (!showDetailView && !weatherData && geohash) {
+                  fetchHfiDataWithState(geohash);
+                }
+              }}
+            />
+          )}
         </div>
       )}
     </>
