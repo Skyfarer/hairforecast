@@ -85,9 +85,9 @@ const WeatherDisplay = ({
   
   // Get HFI status text
   const getHfiStatus = (hfi) => {
-    if (hfi >= 8) return 'Great Hair Conditions';
-    if (hfi >= 5) return 'Moderate Hair Conditions';
-    return 'Bad Hair Conditions';
+    if (hfi >= 8) return 'Great Hair Weather';
+    if (hfi >= 5) return 'Moderate Hair Weather';
+    return 'Bad Hair Weather';
   };
   
   // Get temperature display value
