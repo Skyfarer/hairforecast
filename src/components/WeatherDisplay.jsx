@@ -240,13 +240,6 @@ const WeatherDisplay = ({
           textAlign: 'center',
           marginBottom: '20px'
         }}>
-          <h3 style={{ 
-            margin: '0 0 10px 0', 
-            color: colors.text,
-            fontSize: '1.5em'
-          }}>
-            Hair Forecast Summary
-          </h3>
           <div style={{ 
             fontSize: '3em', 
             fontWeight: 'bold',
