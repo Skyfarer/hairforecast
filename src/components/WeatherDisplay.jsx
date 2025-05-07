@@ -1,37 +1,56 @@
 import React, { useState } from 'react';
 
-const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
+const WeatherDisplay = ({ 
+  weatherData, 
+  summaryData, 
+  useMetric = false, 
+  onToggleUnits,
+  showDetailView = false,
+  onToggleView
+}) => {
   const [selectedInterval, setSelectedInterval] = useState('0h');
   
-  console.log('WeatherDisplay received data:', weatherData);
+  console.log('WeatherDisplay received data:', { weatherData, summaryData });
   
-  if (!weatherData || typeof weatherData !== 'object') {
-    console.log('No weather data or invalid format');
-    return <div>No weather data available</div>;
+  // If we're in detail view but don't have detailed data
+  if (showDetailView && (!weatherData || typeof weatherData !== 'object')) {
+    console.log('No detailed weather data available for detail view');
+    return <div>Loading detailed forecast data...</div>;
   }
   
-  // Get available intervals
-  const intervals = Object.keys(weatherData);
-  console.log('Available intervals:', intervals);
-  
-  if (intervals.length === 0) {
-    console.log('No intervals found in weather data');
-    return <div>No forecast intervals available</div>;
+  // If we're in summary view but don't have summary data
+  if (!showDetailView && (!summaryData || typeof summaryData !== 'object')) {
+    console.log('No summary data available');
+    return <div>Loading weather summary...</div>;
   }
   
-  // Make sure selectedInterval exists in the data, otherwise use the first available
-  const validInterval = intervals.includes(selectedInterval) ? selectedInterval : intervals[0];
-  if (validInterval !== selectedInterval) {
-    setSelectedInterval(validInterval);
-  }
+  // For detail view: get available intervals and current data
+  let intervals = [];
+  let currentData = null;
   
-  // Get data for the selected interval
-  const currentData = weatherData[validInterval];
-  console.log('Current interval data:', validInterval, currentData);
-  
-  if (!currentData) {
-    console.log('No data for selected interval:', validInterval);
-    return <div>No data available for the selected time period</div>;
+  if (showDetailView && weatherData) {
+    intervals = Object.keys(weatherData);
+    console.log('Available intervals:', intervals);
+    
+    if (intervals.length === 0) {
+      console.log('No intervals found in weather data');
+      return <div>No forecast intervals available</div>;
+    }
+    
+    // Make sure selectedInterval exists in the data, otherwise use the first available
+    const validInterval = intervals.includes(selectedInterval) ? selectedInterval : intervals[0];
+    if (validInterval !== selectedInterval) {
+      setSelectedInterval(validInterval);
+    }
+    
+    // Get data for the selected interval
+    currentData = weatherData[validInterval];
+    console.log('Current interval data:', validInterval, currentData);
+    
+    if (!currentData) {
+      console.log('No data for selected interval:', validInterval);
+      return <div>No data available for the selected time period</div>;
+    }
   }
   
   // Convert interval to readable time format
@@ -153,6 +172,22 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
   console.log('Display intervals:', displayIntervals);
   console.log('Sample data for first interval:', weatherData[displayIntervals[0]]);
 
+  // Convert temperature based on units
+  const convertTemperature = (tempF) => {
+    if (tempF === undefined) return 'N/A';
+    return useMetric 
+      ? `${Math.round((tempF - 32) * 5/9)}°C`
+      : `${Math.round(tempF)}°F`;
+  };
+  
+  // Convert wind speed based on units
+  const convertWindSpeed = (windMph) => {
+    if (windMph === undefined) return 'N/A';
+    return useMetric 
+      ? `${Math.round(windMph * 1.60934)} km/h`
+      : `${windMph} mph`;
+  };
+  
   // Detect dark mode using CSS media query
   const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   
@@ -180,29 +215,138 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
     return baseColors;
   };
 
+  // Render the summary view
+  const renderSummaryView = () => {
+    if (!summaryData) return null;
+    
+    const { average_hfi, average_wind_mph, high_temperature_f, intervals_analyzed } = summaryData;
+    const hfiColors = getHfiColorAdjusted(average_hfi);
+    
+    return (
+      <div style={{ 
+        padding: '20px', 
+        backgroundColor: colors.cardBackground, 
+        borderRadius: '8px',
+        boxShadow: colors.shadow,
+        marginBottom: '20px'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          marginBottom: '20px'
+        }}>
+          <h3 style={{ 
+            margin: '0 0 10px 0', 
+            color: colors.text,
+            fontSize: '1.5em'
+          }}>
+            Hair Forecast Summary
+          </h3>
+          <div style={{ 
+            fontSize: '3em', 
+            fontWeight: 'bold',
+            color: hfiColors.text,
+            margin: '10px 0'
+          }}>
+            {average_hfi.toFixed(1)}
+          </div>
+          <div style={{ 
+            padding: '8px 16px', 
+            backgroundColor: hfiColors.bg,
+            color: hfiColors.text,
+            borderRadius: '20px',
+            fontWeight: 'bold',
+            border: `1px solid ${hfiColors.border}`,
+            marginBottom: '10px'
+          }}>
+            {getHfiStatus(average_hfi)}
+          </div>
+          <p style={{ 
+            color: colors.text,
+            margin: '10px 0',
+            fontSize: '0.9em'
+          }}>
+            {getHfiDescription(average_hfi)}
+          </p>
+        </div>
+        
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-around',
+          flexWrap: 'wrap',
+          marginTop: '20px',
+          borderTop: `1px solid ${colors.border}`,
+          paddingTop: '20px'
+        }}>
+          <div style={{ textAlign: 'center', margin: '0 10px' }}>
+            <div style={{ fontSize: '0.9em', color: prefersDarkMode ? '#aaa' : '#666' }}>High Temperature</div>
+            <div style={{ fontSize: '1.4em', fontWeight: 'bold', color: colors.text }}>
+              {convertTemperature(high_temperature_f)}
+            </div>
+          </div>
+          <div style={{ textAlign: 'center', margin: '0 10px' }}>
+            <div style={{ fontSize: '0.9em', color: prefersDarkMode ? '#aaa' : '#666' }}>Average Wind</div>
+            <div style={{ fontSize: '1.4em', fontWeight: 'bold', color: colors.text }}>
+              {convertWindSpeed(average_wind_mph)}
+            </div>
+          </div>
+          <div style={{ textAlign: 'center', margin: '0 10px' }}>
+            <div style={{ fontSize: '0.9em', color: prefersDarkMode ? '#aaa' : '#666' }}>Forecast Period</div>
+            <div style={{ fontSize: '1.4em', fontWeight: 'bold', color: colors.text }}>
+              {intervals_analyzed * 6} hours
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ margin: '15px 0', padding: '15px', backgroundColor: colors.background, borderRadius: '5px', boxShadow: colors.shadow }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
         <h3 style={{ marginTop: '0', marginBottom: '0', color: colors.text }}>Weather &amp; Hair Forecast</h3>
-        <button 
-          onClick={onToggleUnits}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: '1px solid #4CAF50',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.9em',
-            fontWeight: 'bold'
-          }}
-        >
-          {useMetric ? 'Switch to °F' : 'Switch to °C'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            onClick={onToggleView}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#4361ee',
+              color: 'white',
+              border: '1px solid #4361ee',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9em',
+              fontWeight: 'bold'
+            }}
+          >
+            {showDetailView ? 'Show Summary' : 'Show Details'}
+          </button>
+          <button 
+            onClick={onToggleUnits}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: '1px solid #4CAF50',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9em',
+              fontWeight: 'bold'
+            }}
+          >
+            {useMetric ? 'Switch to °F' : 'Switch to °C'}
+          </button>
+        </div>
       </div>
       
-      {/* Forecast table */}
-      <div style={{ overflowX: 'auto' }}>
+      {!showDetailView ? renderSummaryView() : (
+      
+      {showDetailView && (
+        <>
+          {/* Forecast table */}
+          <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: colors.cardBackground, borderRadius: '4px', overflow: 'hidden' }}>
           <thead>
             <tr style={{ backgroundColor: colors.headerBackground }}>
@@ -267,25 +411,27 @@ const WeatherDisplay = ({ weatherData, useMetric = false, onToggleUnits }) => {
             })}
           </tbody>
         </table>
-      </div>
-      
-      {/* Detailed HFI display for selected interval */}
-      {(currentData.hfi !== undefined || currentData.hair_forecast_index !== undefined) && (
-        <div style={{ 
-          marginTop: '20px', 
-          padding: '15px', 
-          backgroundColor: getHfiColorAdjusted(currentData.hfi).bg,
-          borderRadius: '4px',
-          boxShadow: prefersDarkMode ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.1)',
-          borderLeft: `4px solid ${getHfiColorAdjusted(currentData.hfi).border}`
-        }}>
-          <h4 style={{ margin: '0 0 10px 0', color: getHfiColorAdjusted(currentData.hfi).text }}>
-            Hair Forecast Details - {formatInterval(validInterval.replace('h', ''))}
-          </h4>
-          <p style={{ color: prefersDarkMode ? '#bbb' : '#666', margin: '10px 0' }}>
-            {getHfiDescription(currentData.hfi !== undefined ? currentData.hfi : currentData.hair_forecast_index)}
-          </p>
-        </div>
+          </div>
+          
+          {/* Detailed HFI display for selected interval */}
+          {currentData && (currentData.hfi !== undefined || currentData.hair_forecast_index !== undefined) && (
+            <div style={{ 
+              marginTop: '20px', 
+              padding: '15px', 
+              backgroundColor: getHfiColorAdjusted(currentData.hfi).bg,
+              borderRadius: '4px',
+              boxShadow: prefersDarkMode ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.1)',
+              borderLeft: `4px solid ${getHfiColorAdjusted(currentData.hfi).border}`
+            }}>
+              <h4 style={{ margin: '0 0 10px 0', color: getHfiColorAdjusted(currentData.hfi).text }}>
+                Hair Forecast Details - {formatInterval(validInterval.replace('h', ''))}
+              </h4>
+              <p style={{ color: prefersDarkMode ? '#bbb' : '#666', margin: '10px 0' }}>
+                {getHfiDescription(currentData.hfi !== undefined ? currentData.hfi : currentData.hair_forecast_index)}
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

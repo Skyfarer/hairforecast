@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchHfiData, fetchNearbyGeohash } from '../api/api';
+import { fetchHfiData, fetchHfiSummary, fetchNearbyGeohash } from '../api/api';
 import LocationFinder from '../components/LocationFinder';
 import LocationDisplay from '../components/LocationDisplay';
 import WeatherStatus from '../components/WeatherStatus';
@@ -14,9 +14,33 @@ function HomePage() {
   const [wxApiLoading, setWxApiLoading] = useState(false);
   const [wxApiError, setWxApiError] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
+  const [summaryData, setSummaryData] = useState(null);
   const [hfiLoading, setHfiLoading] = useState(false);
   const [hfiError, setHfiError] = useState(null);
   const [useMetric, setUseMetric] = useState(false);
+  const [showDetailView, setShowDetailView] = useState(false);
+
+  // Wrapper function for fetchHfiSummary with state management
+  const fetchHfiSummaryWithState = async (geohash) => {
+    setHfiLoading(true);
+    setHfiError(null);
+    setSummaryData(null);
+    
+    try {
+      // Fetch summary data
+      const data = await fetchHfiSummary(geohash);
+      setSummaryData(data);
+      
+      // If detail view is already active, also fetch detailed data
+      if (showDetailView) {
+        fetchHfiDataWithState(geohash);
+      }
+    } catch (error) {
+      setHfiError(`Failed to fetch HFI summary: ${error.message}`);
+    } finally {
+      setHfiLoading(false);
+    }
+  };
 
   // Wrapper function for fetchHfiData with state management
   const fetchHfiDataWithState = async (geohash) => {
@@ -47,8 +71,8 @@ function HomePage() {
       if (data.results && data.results.length > 0) {
         const receivedGeohash = data.results[0].geohash;
         setGeohash(receivedGeohash);
-        // Fetch HFI data using the geohash
-        fetchHfiDataWithState(receivedGeohash);
+        // Fetch HFI summary data using the geohash
+        fetchHfiSummaryWithState(receivedGeohash);
       } else {
         console.warn('No geohash found in the response');
       }
@@ -132,9 +156,18 @@ function HomePage() {
           />
           
           <WeatherDisplay 
-            weatherData={weatherData} 
+            weatherData={weatherData}
+            summaryData={summaryData}
             useMetric={useMetric}
             onToggleUnits={() => setUseMetric(!useMetric)}
+            showDetailView={showDetailView}
+            onToggleView={() => {
+              setShowDetailView(!showDetailView);
+              // If switching to detail view and we don't have detailed data yet, fetch it
+              if (!showDetailView && !weatherData && geohash) {
+                fetchHfiDataWithState(geohash);
+              }
+            }}
           />
         </div>
       )}

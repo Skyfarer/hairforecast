@@ -1,6 +1,27 @@
 // API functions for weather and geo data
 
 /**
+ * Fetches HFI summary data using a geohash
+ * @param {string} geohash - The geohash location code
+ * @returns {Promise} - Promise that resolves to an object with summary forecast data
+ */
+export const fetchHfiSummary = async (geohash) => {
+  try {
+    const response = await fetch(`/wxapi/hf-summary?geohash=${geohash}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch HFI summary: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('HFI Summary API response:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching HFI summary:', error);
+    throw error;
+  }
+};
+
+/**
  * Fetches HFI (Hair Forecast Index) data using a geohash
  * @param {string} geohash - The geohash location code
  * @returns {Promise} - Promise that resolves to an object with forecast data for the next 48 hours
