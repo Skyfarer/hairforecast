@@ -342,8 +342,6 @@ const WeatherDisplay = ({
       </div>
       
       {!showDetailView ? renderSummaryView() : (
-      
-      {showDetailView && (
         <>
           {/* Forecast table */}
           <div style={{ overflowX: 'auto' }}>
