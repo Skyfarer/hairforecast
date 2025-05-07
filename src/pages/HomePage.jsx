@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchHfiData, fetchHfiSummary, fetchNearbyGeohash, fetchNearestCity } from '../api/api';
 import LocationFinder from '../components/LocationFinder';
 import LocationDisplay from '../components/LocationDisplay';
@@ -7,9 +7,11 @@ import WeatherStatus from '../components/WeatherStatus';
 import WeatherDisplay from '../components/WeatherDisplay';
 
 function HomePage() {
+  const navigate = useNavigate();
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [geolocationAttempted, setGeolocationAttempted] = useState(false);
   const [geohash, setGeohash] = useState(null);
   const [wxApiLoading, setWxApiLoading] = useState(false);
   const [wxApiError, setWxApiError] = useState(null);
@@ -106,14 +108,20 @@ function HomePage() {
     }
   };
 
+  // Attempt geolocation when component mounts
+  useEffect(() => {
+    getLocation();
+  }, []);
+
   const getLocation = () => {
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser')
-      return
+      setError('Geolocation is not supported by your browser');
+      setGeolocationAttempted(true);
+      return;
     }
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -132,13 +140,29 @@ function HomePage() {
         fetchNearestCityWithState(lat, lon);
         
         setLoading(false);
+        setGeolocationAttempted(true);
       },
       (error) => {
+        console.log("Geolocation error:", error.message);
         setError(`Error: ${error.message}`);
         setLoading(false);
-      }
-    )
-  }
+        setGeolocationAttempted(true);
+      },
+      { timeout: 10000 } // 10 second timeout for geolocation
+    );
+  };
+
+  // Redirect to manual location entry if geolocation fails
+  useEffect(() => {
+    if (geolocationAttempted && error && !location) {
+      // Wait a moment before redirecting to show the error
+      const timer = setTimeout(() => {
+        navigate('/manual-location');
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [geolocationAttempted, error, location, navigate]);
 
   return (
     <>
