@@ -291,12 +291,6 @@ const WeatherDisplay = ({
               {convertWindSpeed(average_wind_mph)}
             </div>
           </div>
-          <div style={{ textAlign: 'center', margin: '0 10px' }}>
-            <div style={{ fontSize: '0.9em', color: prefersDarkMode ? '#aaa' : '#666' }}>Forecast Period</div>
-            <div style={{ fontSize: '1.4em', fontWeight: 'bold', color: colors.text }}>
-              {intervals_analyzed * 6} hours
-            </div>
-          </div>
         </div>
       </div>
     );
