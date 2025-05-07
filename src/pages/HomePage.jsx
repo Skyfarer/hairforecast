@@ -188,7 +188,7 @@ function HomePage() {
           display: 'inline-block',
           height: 'fit-content'
         }}>
-          Enter Location Manually
+          Enter a different location
         </Link>
       </div>
       
