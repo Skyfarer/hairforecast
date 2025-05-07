@@ -27,6 +27,7 @@ const WeatherDisplay = ({
   // For detail view: get available intervals and current data
   let intervals = [];
   let currentData = null;
+  let validInterval = null;
   
   if (showDetailView && weatherData) {
     intervals = Object.keys(weatherData);
@@ -38,7 +39,7 @@ const WeatherDisplay = ({
     }
     
     // Make sure selectedInterval exists in the data, otherwise use the first available
-    const validInterval = intervals.includes(selectedInterval) ? selectedInterval : intervals[0];
+    validInterval = intervals.includes(selectedInterval) ? selectedInterval : intervals[0];
     if (validInterval !== selectedInterval) {
       setSelectedInterval(validInterval);
     }
@@ -162,15 +163,17 @@ const WeatherDisplay = ({
   };
 
   // Sort intervals numerically
-  const sortedIntervals = [...intervals].sort((a, b) => {
+  const sortedIntervals = intervals.length > 0 ? [...intervals].sort((a, b) => {
     return parseInt(a.replace('h', '')) - parseInt(b.replace('h', ''));
-  });
+  }) : [];
 
   // Get first 8 intervals or all if less than 8
   const displayIntervals = sortedIntervals.slice(0, 8);
   
   console.log('Display intervals:', displayIntervals);
-  console.log('Sample data for first interval:', weatherData[displayIntervals[0]]);
+  if (displayIntervals.length > 0 && weatherData) {
+    console.log('Sample data for first interval:', weatherData[displayIntervals[0]]);
+  }
 
   // Convert temperature based on units
   const convertTemperature = (tempF) => {
@@ -356,8 +359,10 @@ const WeatherDisplay = ({
             </tr>
           </thead>
           <tbody>
-            {displayIntervals.map(interval => {
+            {weatherData && displayIntervals.map(interval => {
               const data = weatherData[interval];
+              if (!data) return null;
+              
               // Check if HFI is directly in the data object or in a nested object
               const hfi = data.hfi !== undefined ? data.hfi : 
                          (data.hair_forecast_index !== undefined ? data.hair_forecast_index : null);
@@ -412,7 +417,7 @@ const WeatherDisplay = ({
           </div>
           
           {/* Detailed HFI display for selected interval */}
-          {currentData && (currentData.hfi !== undefined || currentData.hair_forecast_index !== undefined) && (
+          {currentData && validInterval && (currentData.hfi !== undefined || currentData.hair_forecast_index !== undefined) && (
             <div style={{ 
               marginTop: '20px', 
               padding: '15px', 
