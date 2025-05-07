@@ -302,7 +302,7 @@ const WeatherDisplay = ({
   return (
     <div style={{ margin: '15px 0', padding: '15px', backgroundColor: colors.background, borderRadius: '5px', boxShadow: colors.shadow }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-        <h3 style={{ marginTop: '0', marginBottom: '0', color: colors.text }}>Weather &amp; Hair Forecast</h3>
+        <h3 style={{ marginTop: '0', marginBottom: '0', color: colors.text, marginRight: '15px' }}>Weather &amp; Hair Forecast</h3>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button 
             onClick={onToggleView}
