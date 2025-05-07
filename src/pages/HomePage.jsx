@@ -169,11 +169,14 @@ function HomePage() {
       <h1>Hair Forecast</h1>
       
       <div style={{ display: 'flex', gap: '15px', margin: '20px 0' }}>
-        <LocationFinder 
-          loading={loading}
-          getLocation={getLocation}
-          error={error}
-        />
+        {/* Only show the Get My Location button if geolocation failed or wasn't attempted */}
+        {(error || !geolocationAttempted) && (
+          <LocationFinder 
+            loading={loading}
+            getLocation={getLocation}
+            error={error}
+          />
+        )}
         
         <Link to="/manual-location" style={{ 
           padding: '8px 16px', 
