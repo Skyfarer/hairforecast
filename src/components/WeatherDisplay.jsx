@@ -253,7 +253,7 @@ const WeatherDisplay = ({
             color: hfiColors.text,
             margin: '10px 0'
           }}>
-            {average_hfi.toFixed(1)}
+            {Math.round(average_hfi)}
           </div>
           <div style={{ 
             padding: '8px 16px', 
@@ -391,7 +391,7 @@ const WeatherDisplay = ({
                     fontWeight: 'bold',
                     color: hfi !== null ? hfiColors.text : (prefersDarkMode ? '#aaa' : '#666')
                   }}>
-                    {hfi !== null ? hfi : 'N/A'}
+                    {hfi !== null ? Math.round(hfi) : 'N/A'}
                   </td>
                   <td style={{ padding: '12px 15px', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>
                     {hfi !== null ? (
