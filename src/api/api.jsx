@@ -34,7 +34,7 @@ export const fetchHfiSummary = async (geohash) => {
  */
 export const fetchHfiData = async (geohash) => {
   try {
-    const response = await fetch(`/wxapi/hfi?geohash=${geohash}`);
+    const response = await fetch(`/wxapi/hfi-detail?geohash=${geohash}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch HFI data: ${response.status} ${response.statusText}`);
     }
