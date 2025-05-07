@@ -7,7 +7,7 @@
  */
 export const fetchHfiSummary = async (geohash) => {
   try {
-    const response = await fetch(`/wxapi/hf-summary?geohash=${geohash}`);
+    const response = await fetch(`/wxapi/hfi-summary?geohash=${geohash}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch HFI summary: ${response.status} ${response.statusText}`);
     }
