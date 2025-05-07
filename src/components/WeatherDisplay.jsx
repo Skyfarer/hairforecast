@@ -6,7 +6,10 @@ const WeatherDisplay = ({
   useMetric = false, 
   onToggleUnits,
   showDetailView = false,
-  onToggleView
+  onToggleView,
+  cityData,
+  cityLoading,
+  cityError
 }) => {
   const [selectedInterval, setSelectedInterval] = useState('0h');
   
@@ -299,10 +302,50 @@ const WeatherDisplay = ({
     );
   };
 
+  // Format city name for display
+  const formatCityName = () => {
+    if (!cityData) return null;
+    
+    let cityName = cityData.name;
+    if (cityData.state_code) {
+      cityName += `, ${cityData.state_code}`;
+    }
+    return cityName;
+  };
+
   return (
     <div style={{ margin: '15px 0', padding: '15px', backgroundColor: colors.background, borderRadius: '5px', boxShadow: colors.shadow }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-        <h3 style={{ marginTop: '0', marginBottom: '0', color: colors.text, marginRight: '15px' }}>Weather &amp; Hair Forecast</h3>
+        <div>
+          <h3 style={{ marginTop: '0', marginBottom: '0', color: colors.text, marginRight: '15px' }}>Weather &amp; Hair Forecast</h3>
+          {cityData && (
+            <div style={{ 
+              color: prefersDarkMode ? '#aaa' : '#666', 
+              fontSize: '0.9em',
+              marginTop: '5px'
+            }}>
+              {formatCityName()}
+            </div>
+          )}
+          {cityLoading && (
+            <div style={{ 
+              color: prefersDarkMode ? '#aaa' : '#666', 
+              fontSize: '0.9em',
+              marginTop: '5px'
+            }}>
+              Loading location...
+            </div>
+          )}
+          {cityError && (
+            <div style={{ 
+              color: 'red', 
+              fontSize: '0.9em',
+              marginTop: '5px'
+            }}>
+              {cityError}
+            </div>
+          )}
+        </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button 
             onClick={onToggleView}

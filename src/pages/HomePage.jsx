@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchHfiData, fetchHfiSummary, fetchNearbyGeohash } from '../api/api';
+import { fetchHfiData, fetchHfiSummary, fetchNearbyGeohash, fetchNearestCity } from '../api/api';
 import LocationFinder from '../components/LocationFinder';
 import LocationDisplay from '../components/LocationDisplay';
 import WeatherStatus from '../components/WeatherStatus';
@@ -19,6 +19,9 @@ function HomePage() {
   const [hfiError, setHfiError] = useState(null);
   const [useMetric, setUseMetric] = useState(false);
   const [showDetailView, setShowDetailView] = useState(false);
+  const [cityData, setCityData] = useState(null);
+  const [cityLoading, setCityLoading] = useState(false);
+  const [cityError, setCityError] = useState(null);
 
   // Wrapper function for fetchHfiSummary with state management
   const fetchHfiSummaryWithState = async (geohash) => {
@@ -83,6 +86,26 @@ function HomePage() {
     }
   };
 
+  // Wrapper function for fetchNearestCity with state management
+  const fetchNearestCityWithState = async (latitude, longitude) => {
+    setCityLoading(true);
+    setCityError(null);
+    setCityData(null);
+    
+    try {
+      const data = await fetchNearestCity(latitude, longitude);
+      if (data && data.city) {
+        setCityData(data.city);
+      } else {
+        console.warn('No city data found in the response');
+      }
+    } catch (error) {
+      setCityError(`Failed to fetch city data: ${error.message}`);
+    } finally {
+      setCityLoading(false);
+    }
+  };
+
   const getLocation = () => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser')
@@ -104,6 +127,9 @@ function HomePage() {
         
         // Fetch weather data using the coordinates
         fetchNearbyGeohashWithState({latitude: lat, longitude: lon});
+        
+        // Fetch nearest city data
+        fetchNearestCityWithState(lat, lon);
         
         setLoading(false);
       },
@@ -169,6 +195,9 @@ function HomePage() {
                   fetchHfiDataWithState(geohash);
                 }
               }}
+              cityData={cityData}
+              cityLoading={cityLoading}
+              cityError={cityError}
             />
           )}
         </div>

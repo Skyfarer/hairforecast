@@ -181,3 +181,28 @@ export const fetchCities = async (countryId, query = '') => {
     throw error;
   }
 };
+
+/**
+ * Fetches the nearest city to a given latitude and longitude
+ * @param {number} latitude - The latitude coordinate
+ * @param {number} longitude - The longitude coordinate
+ * @returns {Promise} - Promise that resolves to the nearest city data
+ */
+export const fetchNearestCity = async (latitude, longitude) => {
+  try {
+    const url = `/geoapi/nearest_city?lat=${latitude}&lon=${longitude}`;
+    console.log('Fetching nearest city with URL:', url);
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch nearest city: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Nearest city API response:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching nearest city:', error);
+    throw error;
+  }
+};
