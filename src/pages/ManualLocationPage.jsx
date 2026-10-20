@@ -4,6 +4,7 @@ import { fetchHfiData, fetchHfiSummary, fetchNearbyGeohash, fetchCountries } fro
 import ManualLocationEntry from '../components/ManualLocationEntry';
 import WeatherStatus from '../components/WeatherStatus';
 import WeatherDisplay from '../components/WeatherDisplay';
+import HairForecastLogo from '../components/HairForecastLogo';
 
 function ManualLocationPage() {
   const [locationName, setLocationName] = useState(null);
@@ -105,60 +106,113 @@ function ManualLocationPage() {
     }
   }, [locationName]);
 
-  return (
-    <>
-      <h1>Hair Forecast</h1>
-      
-      <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
-        <Link to="/" style={{ 
-          padding: '8px 16px', 
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          borderRadius: '4px',
-          textDecoration: 'none',
-          fontWeight: 'bold',
-          display: 'inline-block'
+  // Show weather results if we have location and data
+  if (locationName && (summaryData || weatherData)) {
+    return (
+      <div style={{ minHeight: '100vh' }}>
+        <header style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          padding: '20px 0',
+          marginBottom: '20px'
         }}>
-          Back to Home
-        </Link>
-      </div>
-      
-      <ManualLocationEntry 
-        onLocationSubmit={handleLocationSubmit}
-        loading={wxApiLoading}
-      />
-      
-      {locationName && (
-        <div style={{ marginTop: '20px' }}>
-          <h3>Weather for: {locationName}</h3>
-          
-          <WeatherStatus 
-            wxApiLoading={wxApiLoading}
-            wxApiError={wxApiError}
-            geohash={geohash}
-            hfiLoading={hfiLoading}
-            hfiError={hfiError}
-          />
-          
-          {(summaryData || weatherData) && (
-            <WeatherDisplay 
-              weatherData={weatherData}
-              summaryData={summaryData}
-              useMetric={useMetric}
-              onToggleUnits={() => setUseMetric(!useMetric)}
-              showDetailView={showDetailView}
-              onToggleView={() => {
-                setShowDetailView(!showDetailView);
-                // If switching to detail view and we don't have detailed data yet, fetch it
-                if (!showDetailView && !weatherData && geohash) {
-                  fetchHfiDataWithState(geohash);
-                }
-              }}
-            />
-          )}
+          <HairForecastLogo size="medium" />
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            background: 'var(--bg-secondary)',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            minWidth: '300px',
+            border: '1px solid var(--border-color)',
+            boxShadow: 'var(--shadow)'
+          }}>
+            <svg style={{ marginRight: '8px', color: 'var(--text-secondary)' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <span style={{
+              flex: 1,
+              color: 'var(--text-primary)',
+              fontSize: '14px'
+            }}>
+              {locationName}
+            </span>
+          </div>
+        </header>
+
+        <WeatherDisplay 
+          weatherData={weatherData}
+          summaryData={summaryData}
+          useMetric={useMetric}
+          onToggleUnits={() => setUseMetric(!useMetric)}
+          showDetailView={showDetailView}
+          onToggleView={() => {
+            setShowDetailView(!showDetailView);
+            if (!showDetailView && !weatherData && geohash) {
+              fetchHfiDataWithState(geohash);
+            }
+          }}
+        />
+        
+        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <Link to="/" className="btn-secondary">
+            Back to Home
+          </Link>
         </div>
-      )}
-    </>
+      </div>
+    );
+  }
+
+  // Show manual location entry screen
+  return (
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      textAlign: 'center',
+      padding: '20px'
+    }}>
+      <HairForecastLogo size="large" />
+      
+      <div className="card" style={{ 
+        marginTop: '40px',
+        width: '100%',
+        maxWidth: '500px',
+        textAlign: 'center'
+      }}>
+        <h2 style={{ 
+          color: 'var(--text-primary)', 
+          margin: '0 0 30px 0',
+          fontSize: '32px',
+          fontWeight: '600'
+        }}>
+          Enter Location
+        </h2>
+        
+        <ManualLocationEntry 
+          onLocationSubmit={handleLocationSubmit}
+          loading={wxApiLoading}
+        />
+        
+        <div style={{ marginTop: '20px' }}>
+          <Link to="/" className="btn-secondary">
+            Back to Home
+          </Link>
+        </div>
+        
+        <WeatherStatus 
+          wxApiLoading={wxApiLoading}
+          wxApiError={wxApiError}
+          geohash={geohash}
+          hfiLoading={hfiLoading}
+          hfiError={hfiError}
+        />
+      </div>
+    </div>
   );
 }
 

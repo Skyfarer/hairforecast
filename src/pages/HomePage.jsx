@@ -5,6 +5,7 @@ import LocationFinder from '../components/LocationFinder';
 import LocationDisplay from '../components/LocationDisplay';
 import WeatherStatus from '../components/WeatherStatus';
 import WeatherDisplay from '../components/WeatherDisplay';
+import HairForecastLogo from '../components/HairForecastLogo';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -164,72 +165,170 @@ function HomePage() {
     }
   }, [geolocationAttempted, error, location, navigate]);
 
+  // Show weather results if we have location and data
+  if (location && (summaryData || weatherData)) {
+    return (
+      <div style={{ minHeight: '100vh', padding: '20px 0' }}>
+        <WeatherDisplay 
+          weatherData={weatherData}
+          summaryData={summaryData}
+          useMetric={useMetric}
+          onToggleUnits={() => setUseMetric(!useMetric)}
+          showDetailView={showDetailView}
+          onToggleView={() => {
+            setShowDetailView(!showDetailView);
+            if (!showDetailView && !weatherData && geohash) {
+              fetchHfiDataWithState(geohash);
+            }
+          }}
+          cityData={cityData}
+          cityLoading={cityLoading}
+          cityError={cityError}
+          showLogo={true}
+          onChangeLocation={() => navigate('/manual-location')}
+        />
+      </div>
+    );
+  }
+
+  // Show initial loading/location screen
   return (
-    <>
-      <h1>Hair Forecast</h1>
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      textAlign: 'center',
+      padding: '20px'
+    }}>
+      <HairForecastLogo size="large" />
       
-      <div style={{ display: 'flex', gap: '15px', margin: '20px 0' }}>
-        {/* Only show the Get My Location button if geolocation failed or wasn't attempted */}
-        {(error || !geolocationAttempted) && (
-          <LocationFinder 
-            loading={loading}
-            getLocation={getLocation}
-            error={error}
-          />
+      <div className="card" style={{ 
+        marginTop: '40px',
+        width: '100%',
+        maxWidth: '500px',
+        textAlign: 'center'
+      }}>
+        
+        {loading && (
+          <div style={{ 
+            padding: '40px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '20px'
+          }}>
+            <div style={{
+              width: '120px',
+              height: '120px',
+              background: 'var(--border-color)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative'
+            }}>
+              <svg style={{ color: 'var(--text-secondary)' }} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <div style={{
+                position: 'absolute',
+                bottom: '8px',
+                right: '8px',
+                width: '24px',
+                height: '24px',
+                background: '#ff6b6b',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '12px'
+              }}>
+                📍
+              </div>
+            </div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
+              Getting Location
+            </div>
+          </div>
         )}
         
-        <Link to="/manual-location" style={{ 
-          padding: '8px 16px', 
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          borderRadius: '4px',
-          textDecoration: 'none',
-          fontWeight: 'bold',
-          display: 'inline-block',
-          height: 'fit-content'
-        }}>
-          Enter a different location
-        </Link>
+        {!loading && (
+          <>
+            {error && (
+              <div style={{ 
+                color: '#e74c3c', 
+                margin: '0 0 20px 0',
+                padding: '12px',
+                background: '#fdf2f2',
+                borderRadius: '8px',
+                border: '1px solid #fecaca'
+              }}>
+                {error}
+              </div>
+            )}
+            
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              background: 'var(--bg-primary)',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginBottom: '20px',
+              border: '2px solid var(--border-color)'
+            }}>
+              <svg style={{ marginRight: '12px', color: 'var(--text-secondary)' }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <input
+                type="text"
+                placeholder="Address, City or Country"
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  background: 'transparent',
+                  flex: 1,
+                  color: 'var(--text-primary)',
+                  fontSize: '16px'
+                }}
+                onClick={() => navigate('/manual-location')}
+                readOnly
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              {!geolocationAttempted && (
+                <button 
+                  className="btn-primary"
+                  onClick={getLocation}
+                  disabled={loading}
+                >
+                  Get My Location
+                </button>
+              )}
+              
+              <button 
+                className="btn-secondary"
+                onClick={() => navigate('/manual-location')}
+              >
+                Enter Manually
+              </button>
+            </div>
+          </>
+        )}
+        
+        <WeatherStatus 
+          wxApiLoading={wxApiLoading}
+          wxApiError={wxApiError}
+          geohash={geohash}
+          hfiLoading={hfiLoading}
+          hfiError={hfiError}
+        />
       </div>
-      
-      {error && (
-        <div className="error" style={{ whiteSpace: 'pre-line', color: 'red', margin: '10px 0' }}>
-          {error}
-        </div>
-      )}
-      
-      {location && (
-        <div>
-          <WeatherStatus 
-            wxApiLoading={wxApiLoading}
-            wxApiError={wxApiError}
-            geohash={geohash}
-            hfiLoading={hfiLoading}
-            hfiError={hfiError}
-          />
-          
-          {(summaryData || weatherData) && (
-            <WeatherDisplay 
-              weatherData={weatherData}
-              summaryData={summaryData}
-              useMetric={useMetric}
-              onToggleUnits={() => setUseMetric(!useMetric)}
-              showDetailView={showDetailView}
-              onToggleView={() => {
-                setShowDetailView(!showDetailView);
-                // If switching to detail view and we don't have detailed data yet, fetch it
-                if (!showDetailView && !weatherData && geohash) {
-                  fetchHfiDataWithState(geohash);
-                }
-              }}
-              cityData={cityData}
-              cityLoading={cityLoading}
-              cityError={cityError}
-            />
-          )}
-        </div>
-      )}
-    </>
+    </div>
   )
 }
 

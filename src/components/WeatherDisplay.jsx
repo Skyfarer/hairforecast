@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import HairForecastLogo from './HairForecastLogo';
+
 const WeatherDisplay = ({ 
   weatherData, 
   summaryData, 
@@ -9,7 +11,9 @@ const WeatherDisplay = ({
   onToggleView,
   cityData,
   cityLoading,
-  cityError
+  cityError,
+  showLogo = false,
+  onChangeLocation
 }) => {
   const [selectedInterval, setSelectedInterval] = useState('0h');
   
@@ -221,7 +225,7 @@ const WeatherDisplay = ({
     return baseColors;
   };
 
-  // Render the summary view
+  // Render the summary view to match Figma design
   const renderSummaryView = () => {
     if (!summaryData) return null;
     
@@ -229,66 +233,134 @@ const WeatherDisplay = ({
     const hfiColors = getHfiColorAdjusted(average_hfi);
     
     return (
-      <div style={{ 
-        padding: '20px', 
-        backgroundColor: colors.cardBackground, 
-        borderRadius: '8px',
-        boxShadow: colors.shadow,
-        marginBottom: '20px'
-      }}>
+      <div className="card">
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
-          marginBottom: '20px'
+          marginBottom: '30px'
         }}>
           <div style={{ 
-            fontSize: '3em', 
-            fontWeight: 'bold',
-            color: hfiColors.text,
-            margin: '10px 0'
-          }}>
-            {Math.round(average_hfi)}
-          </div>
-          <div style={{ 
-            padding: '8px 16px', 
+            width: '120px',
+            height: '120px',
             backgroundColor: hfiColors.bg,
-            color: hfiColors.text,
-            borderRadius: '20px',
-            fontWeight: 'bold',
-            border: `1px solid ${hfiColors.border}`,
-            marginBottom: '10px'
+            borderRadius: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '20px',
+            border: `2px solid ${hfiColors.border}`
           }}>
-            {getHfiStatus(average_hfi)}
+            <div style={{ 
+              fontSize: '48px', 
+              fontWeight: '700',
+              color: hfiColors.text,
+              lineHeight: '1'
+            }}>
+              {Math.round(average_hfi)}
+            </div>
+            <div style={{ 
+              fontSize: '12px',
+              fontWeight: '600',
+              color: hfiColors.text,
+              marginTop: '4px'
+            }}>
+              {getHfiStatus(average_hfi)}
+            </div>
           </div>
+          
           <p style={{ 
-            color: colors.text,
-            margin: '10px 0',
-            fontSize: '0.9em'
+            color: 'var(--text-primary)',
+            margin: '0',
+            fontSize: '16px',
+            lineHeight: '1.5',
+            maxWidth: '400px'
           }}>
             {getHfiDescription(average_hfi)}
           </p>
         </div>
         
-        <div style={{ 
+        <div className="weather-metrics" style={{ 
           display: 'flex', 
           justifyContent: 'space-around',
-          flexWrap: 'wrap',
-          marginTop: '20px',
-          borderTop: `1px solid ${colors.border}`,
-          paddingTop: '20px'
+          gap: '20px',
+          marginTop: '30px'
         }}>
-          <div style={{ textAlign: 'center', margin: '0 10px' }}>
-            <div style={{ fontSize: '0.9em', color: prefersDarkMode ? '#aaa' : '#666' }}>High Temperature</div>
-            <div style={{ fontSize: '1.4em', fontWeight: 'bold', color: colors.text }}>
-              {convertTemperature(high_temperature_f)}
+          <div style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flex: 1
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%)',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px'
+            }}>
+              🌡️
+            </div>
+            <div>
+              <div style={{ 
+                fontSize: '12px', 
+                color: 'var(--text-secondary)',
+                marginBottom: '4px',
+                fontWeight: '500'
+              }}>
+                High Temperature
+              </div>
+              <div style={{ 
+                fontSize: '24px', 
+                fontWeight: '700', 
+                color: 'var(--text-primary)',
+                lineHeight: '1'
+              }}>
+                {convertTemperature(high_temperature_f)}
+              </div>
             </div>
           </div>
-          <div style={{ textAlign: 'center', margin: '0 10px' }}>
-            <div style={{ fontSize: '0.9em', color: prefersDarkMode ? '#aaa' : '#666' }}>Average Wind</div>
-            <div style={{ fontSize: '1.4em', fontWeight: 'bold', color: colors.text }}>
-              {convertWindSpeed(average_wind_mph)}
+          
+          <div style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flex: 1
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px'
+            }}>
+              💨
+            </div>
+            <div>
+              <div style={{ 
+                fontSize: '12px', 
+                color: 'var(--text-secondary)',
+                marginBottom: '4px',
+                fontWeight: '500'
+              }}>
+                Average Wind
+              </div>
+              <div style={{ 
+                fontSize: '24px', 
+                fontWeight: '700', 
+                color: 'var(--text-primary)',
+                lineHeight: '1'
+              }}>
+                {convertWindSpeed(average_wind_mph)}
+              </div>
             </div>
           </div>
         </div>
@@ -308,84 +380,105 @@ const WeatherDisplay = ({
   };
 
   return (
-    <div style={{ margin: '15px 0', padding: '15px', backgroundColor: colors.background, borderRadius: '5px', boxShadow: colors.shadow }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-        <div>
-          <h3 style={{ marginTop: '0', marginBottom: '0', color: colors.text, marginRight: '15px' }}>Weather &amp; Hair Forecast</h3>
-          {cityData && (
-            <div style={{ 
-              color: prefersDarkMode ? '#aaa' : '#666', 
-              fontSize: '0.9em',
-              marginTop: '5px'
-            }}>
-              {formatCityName()}
+    <div>
+      <div style={{ marginBottom: '20px' }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '20px'
+        }}>
+          {/* Location text on the left */}
+          <div style={{ flex: '0 0 auto', minWidth: '120px' }}>
+            {cityData && (
+              <div style={{ 
+                color: 'var(--text-secondary)', 
+                fontSize: '16px',
+                fontWeight: '500'
+              }}>
+                {formatCityName()}
+              </div>
+            )}
+            {cityLoading && (
+              <div style={{ 
+                color: 'var(--text-secondary)', 
+                fontSize: '16px'
+              }}>
+                Loading location...
+              </div>
+            )}
+            {cityError && (
+              <div style={{ 
+                color: '#e74c3c', 
+                fontSize: '16px'
+              }}>
+                {cityError}
+              </div>
+            )}
+          </div>
+          
+          {/* Logo in the center */}
+          {showLogo && (
+            <div style={{ flex: '1 1 auto', textAlign: 'center', minWidth: '200px' }}>
+              <HairForecastLogo size="medium" />
             </div>
           )}
-          {cityLoading && (
-            <div style={{ 
-              color: prefersDarkMode ? '#aaa' : '#666', 
-              fontSize: '0.9em',
-              marginTop: '5px'
-            }}>
-              Loading location...
-            </div>
-          )}
-          {cityError && (
-            <div style={{ 
-              color: 'red', 
-              fontSize: '0.9em',
-              marginTop: '5px'
-            }}>
-              {cityError}
-            </div>
-          )}
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button 
-            onClick={onToggleView}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#4361ee',
-              color: 'white',
-              border: '1px solid #4361ee',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.9em',
-              fontWeight: 'bold'
-            }}
-          >
-            {showDetailView ? 'Show Summary' : 'Show Details'}
-          </button>
-          <button 
-            onClick={onToggleUnits}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: '1px solid #4CAF50',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.9em',
-              fontWeight: 'bold'
-            }}
-          >
-            {useMetric ? 'Switch to °F' : 'Switch to °C'}
-          </button>
+          
+          {/* Buttons on the right */}
+          <div className="mobile-buttons" style={{ 
+            display: 'flex', 
+            gap: '8px', 
+            flexWrap: 'wrap',
+            flex: '0 0 auto',
+            minWidth: '120px',
+            justifyContent: 'flex-end'
+          }}>
+            <button 
+              onClick={onToggleView}
+              className="btn-primary"
+              style={{ fontSize: '14px', padding: '8px 12px' }}
+            >
+              {showDetailView ? 'Summary' : 'Details'}
+            </button>
+            <button 
+              onClick={onToggleUnits}
+              className="btn-secondary"
+              style={{
+                background: 'var(--text-primary)',
+                color: 'var(--bg-secondary)',
+                border: `1px solid var(--text-primary)`,
+                fontSize: '14px',
+                padding: '8px 12px'
+              }}
+            >
+              {useMetric ? '°F' : '°C'}
+            </button>
+            {onChangeLocation && (
+              <button 
+                onClick={onChangeLocation}
+                className="btn-secondary"
+                style={{ fontSize: '14px', padding: '8px 12px' }}
+              >
+                Change
+              </button>
+            )}
+          </div>
         </div>
       </div>
       
       {!showDetailView ? renderSummaryView() : (
-        <>
+        <div className="card">
           {/* Forecast table */}
-          <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: colors.cardBackground, borderRadius: '4px', overflow: 'hidden' }}>
+          <div className="table-container" style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'transparent', borderRadius: '4px', overflow: 'hidden' }}>
           <thead>
-            <tr style={{ backgroundColor: colors.headerBackground }}>
-              <th style={{ padding: '12px 15px', textAlign: 'left', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Time</th>
-              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Temperature</th>
-              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Wind Speed</th>
-              <th style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>HFI</th>
-              <th style={{ padding: '12px 15px', textAlign: 'left', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>Hair Day Quality</th>
+            <tr style={{ backgroundColor: 'var(--bg-primary)' }}>
+              <th style={{ padding: '16px', textAlign: 'left', borderBottom: `1px solid var(--border-color)`, color: 'var(--text-primary)', fontWeight: '600' }}>Time</th>
+              <th style={{ padding: '16px', textAlign: 'center', borderBottom: `1px solid var(--border-color)`, color: 'var(--text-primary)', fontWeight: '600' }}>Temperature</th>
+              <th style={{ padding: '16px', textAlign: 'center', borderBottom: `1px solid var(--border-color)`, color: 'var(--text-primary)', fontWeight: '600' }}>Wind Speed</th>
+              <th style={{ padding: '16px', textAlign: 'center', borderBottom: `1px solid var(--border-color)`, color: 'var(--text-primary)', fontWeight: '600' }}>HFI</th>
+              <th style={{ padding: '16px', textAlign: 'left', borderBottom: `1px solid var(--border-color)`, color: 'var(--text-primary)', fontWeight: '600' }}>Hair Day Quality</th>
             </tr>
           </thead>
           <tbody>
@@ -401,38 +494,39 @@ const WeatherDisplay = ({
               return (
                 <tr key={interval} 
                     style={{ 
-                      backgroundColor: interval === selectedInterval ? hfiColors.bg : colors.cardBackground,
-                      cursor: 'pointer'
+                      backgroundColor: interval === selectedInterval ? hfiColors.bg : 'transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
                     }}
                     onClick={() => setSelectedInterval(interval)}>
-                  <td style={{ padding: '12px 15px', borderBottom: `1px solid ${colors.border}`, fontWeight: interval === selectedInterval ? 'bold' : 'normal', color: colors.text }}>
+                  <td style={{ padding: '16px', borderBottom: `1px solid var(--border-color)`, fontWeight: interval === selectedInterval ? '600' : 'normal', color: 'var(--text-primary)' }}>
                     {formatInterval(interval.replace('h', ''))}
                   </td>
-                  <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>
+                  <td style={{ padding: '16px', textAlign: 'center', borderBottom: `1px solid var(--border-color)`, color: 'var(--text-primary)' }}>
                     {getTemperature(data)}
                   </td>
-                  <td style={{ padding: '12px 15px', textAlign: 'center', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>
+                  <td style={{ padding: '16px', textAlign: 'center', borderBottom: `1px solid var(--border-color)`, color: 'var(--text-primary)' }}>
                     {getWindSpeed(data)}
                   </td>
                   <td style={{ 
-                    padding: '12px 15px', 
+                    padding: '16px', 
                     textAlign: 'center', 
-                    borderBottom: `1px solid ${colors.border}`,
-                    fontWeight: 'bold',
-                    color: hfi !== null ? hfiColors.text : (prefersDarkMode ? '#aaa' : '#666')
+                    borderBottom: `1px solid var(--border-color)`,
+                    fontWeight: '600',
+                    color: hfi !== null ? hfiColors.text : 'var(--text-secondary)'
                   }}>
                     {hfi !== null ? Math.round(hfi) : 'N/A'}
                   </td>
-                  <td style={{ padding: '12px 15px', borderBottom: `1px solid ${colors.border}`, color: colors.text }}>
+                  <td style={{ padding: '16px', borderBottom: `1px solid var(--border-color)`, color: 'var(--text-primary)' }}>
                     {hfi !== null ? (
                       <span style={{ 
-                        padding: '4px 8px', 
-                        borderRadius: '12px',
+                        padding: '6px 12px', 
+                        borderRadius: '16px',
                         backgroundColor: hfiColors.bg,
                         color: hfiColors.text,
-                        fontWeight: 'bold',
+                        fontWeight: '600',
                         border: `1px solid ${hfiColors.border}`,
-                        fontSize: '0.9em',
+                        fontSize: '13px',
                         whiteSpace: 'nowrap'
                       }}>
                         {getHfiStatus(hfi)}
@@ -449,22 +543,21 @@ const WeatherDisplay = ({
           {/* Detailed HFI display for selected interval */}
           {currentData && validInterval && (currentData.hfi !== undefined || currentData.hair_forecast_index !== undefined) && (
             <div style={{ 
-              marginTop: '20px', 
-              padding: '15px', 
+              marginTop: '24px', 
+              padding: '20px', 
               backgroundColor: getHfiColorAdjusted(currentData.hfi).bg,
-              borderRadius: '4px',
-              boxShadow: prefersDarkMode ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.1)',
-              borderLeft: `4px solid ${getHfiColorAdjusted(currentData.hfi).border}`
+              borderRadius: '12px',
+              border: `2px solid ${getHfiColorAdjusted(currentData.hfi).border}`
             }}>
-              <h4 style={{ margin: '0 0 10px 0', color: getHfiColorAdjusted(currentData.hfi).text }}>
+              <h4 style={{ margin: '0 0 12px 0', color: getHfiColorAdjusted(currentData.hfi).text, fontSize: '18px', fontWeight: '600' }}>
                 Hair Forecast Details - {formatInterval(validInterval.replace('h', ''))}
               </h4>
-              <p style={{ color: prefersDarkMode ? '#bbb' : '#666', margin: '10px 0' }}>
+              <p style={{ color: getHfiColorAdjusted(currentData.hfi).text, margin: '0', fontSize: '16px', lineHeight: '1.5' }}>
                 {getHfiDescription(currentData.hfi !== undefined ? currentData.hfi : currentData.hair_forecast_index)}
               </p>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
