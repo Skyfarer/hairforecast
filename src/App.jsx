@@ -1,17 +1,15 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import './App.css'
-import HomePage from './pages/HomePage'
-import ManualLocationPage from './pages/ManualLocationPage'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import ForecastPage from './pages/ForecastPage'
 
-function App() {
+export default function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/manual-location" element={<ManualLocationPage />} />
+        <Route path="/" element={<ForecastPage />} />
+        {/* Old bookmark from the two-page app: everything lives on one page now. */}
+        <Route path="/manual-location" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   )
 }
-
-export default App
