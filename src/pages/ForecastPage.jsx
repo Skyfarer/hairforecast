@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Landing from '../components/Landing'
 import ForecastCard from '../components/ForecastCard'
@@ -21,9 +22,22 @@ function localeCountry() {
  * The whole app on one page. A location is either a search result (with a
  * name) or a device position (labelled afterwards by the nearest-city lookup).
  * The last location and the unit system are remembered in localStorage.
+ *
+ * On a city page (`city` set) the city is shown instead of the remembered
+ * location; picking another place saves it and goes back to the home page.
  */
-export default function ForecastPage() {
-  const [location, setLocation] = useLocalStorage('hf.location', null)
+export default function ForecastPage({ city = null, cityInfoHtml = null }) {
+  const [savedLocation, setSavedLocation] = useLocalStorage('hf.location', null)
+  const navigate = useNavigate()
+  const cityLocation = useMemo(
+    () => city && { latitude: city.latitude, longitude: city.longitude, source: 'city', place: city },
+    [city],
+  )
+  const location = cityLocation || savedLocation
+  const setLocation = useCallback((next) => {
+    setSavedLocation(next)
+    if (city) navigate('/')
+  }, [city, navigate, setSavedLocation])
   const [units, setUnits] = useLocalStorage('hf.units', defaultUnits)
   const [place, setPlace] = useState(null)
   const geo = useGeolocation()
@@ -74,6 +88,11 @@ export default function ForecastPage() {
     setLocation({ latitude: p.latitude, longitude: p.longitude, source: 'search', place: p })
   }
 
+  // Leaving a city page for the home page in-app: drop the city's title.
+  useEffect(() => {
+    if (!city) document.title = 'Hair Forecast: Frizz & Humidity Forecast for Your Hair'
+  }, [city])
+
   const countryHint = useMemo(() => (place && place.country_code) || localeCountry(), [place])
 
   const placeName = location && location.source === 'device' && place
@@ -105,6 +124,7 @@ export default function ForecastPage() {
               <p className="page-note" role="status">{geo.error}</p>
             )}
             <ForecastCard
+              heading={city ? `Hair Forecast for ${city.name}` : undefined}
               placeName={placeName}
               placeDetail={place ? placeDetail(place) : ''}
               status={forecast.status}
@@ -114,6 +134,7 @@ export default function ForecastPage() {
               onUnits={setUnits}
               onReload={forecast.reload}
             />
+            {city && cityInfoHtml && <div dangerouslySetInnerHTML={{ __html: cityInfoHtml }} />}
           </>
         )}
         <Footer />

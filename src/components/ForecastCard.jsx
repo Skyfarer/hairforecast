@@ -14,7 +14,7 @@ const UNITS = [
   { value: 'metric', label: '°C' },
 ]
 
-export default function ForecastCard({ placeName, placeDetail, status, data, error, units, onUnits, onReload }) {
+export default function ForecastCard({ heading = 'Weather & Hair Forecast', placeName, placeDetail, status, data, error, units, onUnits, onReload }) {
   const [view, setView] = useState('summary')
   const [selected, setSelected] = useState(null)
 
@@ -27,7 +27,7 @@ export default function ForecastCard({ placeName, placeDetail, status, data, err
     <section className={`card forecast-card ${status === 'loading' ? 'is-loading' : ''}`} aria-busy={status === 'loading'}>
       <header className="card-head">
         <div className="card-title">
-          <h1>Weather &amp; Hair Forecast</h1>
+          <h1>{heading}</h1>
           <div className="card-place">
             <PinIcon className="place-icon" />
             <span className="place-name">{placeName || 'Your location'}</span>

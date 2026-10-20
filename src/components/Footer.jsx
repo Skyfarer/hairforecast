@@ -18,6 +18,7 @@ export default function Footer() {
           <p className="muted">Forecasts come from the ECMWF global model, updated daily, at six-hour steps.</p>
         </div>
       </details>
+      <p className="foot-links"><a href="/hair-forecast/">Hair forecasts by city</a></p>
       <p className="foot-copy">© {new Date().getFullYear()} Hair Forecast</p>
     </footer>
   )

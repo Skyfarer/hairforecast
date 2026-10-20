@@ -323,7 +323,23 @@ button:disabled { cursor: default; opacity: 0.65; }
 .about-body p + p, .about-body ul + p { margin-top: 10px; }
 .about-scale { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .about-scale li { display: flex; align-items: center; gap: 10px; }
+.foot-links { margin-top: 16px; }
+.foot-links a { color: var(--brand-strong); text-decoration: none; }
+.foot-links a:hover { text-decoration: underline; }
 .foot-copy { margin-top: 16px; font-size: 12.5px; color: var(--text-faint); }
+
+/* ---------- City pages and hub (static HTML from scripts/city-pages.mjs) ---------- */
+.city-info { margin-top: 20px; line-height: 1.6; }
+.city-info h2 { font-size: 20px; margin: 0 0 10px; }
+.city-info h3 { font-size: 15px; margin: 18px 0 8px; color: var(--text-muted); }
+.city-info p + p, .city-info ul + p { margin-top: 10px; }
+.city-today { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.city-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.city-links a, .city-info a, .hub a { color: var(--brand-strong); text-decoration: none; }
+.city-links a:hover, .city-info a:hover, .hub a:hover { text-decoration: underline; }
+.hub h1 { margin: 8px 0; }
+.hub-group { margin-top: 20px; }
+.hub-group h2 { font-size: 15px; margin: 0 0 6px; color: var(--text-muted); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 640px) {

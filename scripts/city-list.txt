@@ -1,0 +1,202 @@
+# Cities that get a static, indexable page at /hair-forecast/<slug>/.
+# One per line: Name | state/region code | ISO2 country [| display name]
+# (Name and region code as spelled in hf_geoapi/world.sqlite3.)
+# Resolve coordinates with:  python3 scripts/resolve_cities.py
+# (writes scripts/cities.json, which the build reads; no sqlite needed at build time)
+
+# --- United States: largest metros plus the humid Gulf/Southeast markets ---
+New York City | NY | US | New York
+Los Angeles | CA | US
+Chicago | IL | US
+Houston | TX | US
+Phoenix | AZ | US
+Philadelphia | PA | US
+San Antonio | TX | US
+San Diego | CA | US
+Dallas | TX | US
+Austin | TX | US
+Jacksonville | FL | US
+Fort Worth | TX | US
+San Jose | CA | US
+Columbus | OH | US
+Charlotte | NC | US
+Indianapolis | IN | US
+San Francisco | CA | US
+Seattle | WA | US
+Denver | CO | US
+Oklahoma City | OK | US
+Nashville | TN | US
+Washington D.C. | DC | US | Washington, D.C.
+El Paso | TX | US
+Las Vegas | NV | US
+Boston | MA | US
+Detroit | MI | US
+Portland | OR | US
+Louisville | KY | US
+Memphis | TN | US
+Baltimore | MD | US
+Milwaukee | WI | US
+Albuquerque | NM | US
+Tucson | AZ | US
+Fresno | CA | US
+Sacramento | CA | US
+Mesa | AZ | US
+Atlanta | GA | US
+Kansas City | MO | US
+Colorado Springs | CO | US
+Omaha | NE | US
+Raleigh | NC | US
+Miami | FL | US
+Virginia Beach | VA | US
+Long Beach | CA | US
+Oakland | CA | US
+Minneapolis | MN | US
+Tulsa | OK | US
+Tampa | FL | US
+Arlington | TX | US
+New Orleans | LA | US
+Wichita | KS | US
+Cleveland | OH | US
+Bakersfield | CA | US
+Aurora | CO | US
+Anaheim | CA | US
+Honolulu | HI | US
+Riverside | CA | US
+Corpus Christi | TX | US
+Lexington | KY | US
+Henderson | NV | US
+St. Louis | MO | US
+Pittsburgh | PA | US
+Cincinnati | OH | US
+Anchorage | AK | US
+Greensboro | NC | US
+Plano | TX | US
+Newark | NJ | US
+Lincoln | NE | US
+Orlando | FL | US
+Irvine | CA | US
+Toledo | OH | US
+Jersey City | NJ | US
+Chula Vista | CA | US
+Durham | NC | US
+Fort Wayne | IN | US
+St. Petersburg | FL | US
+Laredo | TX | US
+Buffalo | NY | US
+Madison | WI | US
+Lubbock | TX | US
+Chandler | AZ | US
+Scottsdale | AZ | US
+Reno | NV | US
+Glendale | AZ | US
+Norfolk | VA | US
+Winston-Salem | NC | US
+North Las Vegas | NV | US
+Gilbert | AZ | US
+Chesapeake | VA | US
+Irving | TX | US
+Hialeah | FL | US
+Garland | TX | US
+Boise | ID | US
+Richmond | VA | US
+Baton Rouge | LA | US
+Spokane | WA | US
+Des Moines | IA | US
+Tacoma | WA | US
+San Bernardino | CA | US
+Modesto | CA | US
+Birmingham | AL | US
+Rochester | NY | US
+Fayetteville | NC | US
+Montgomery | AL | US
+Salt Lake City | UT | US
+Huntsville | AL | US
+Little Rock | AR | US
+Grand Rapids | MI | US
+Knoxville | TN | US
+Worcester | MA | US
+Providence | RI | US
+Tallahassee | FL | US
+Fort Lauderdale | FL | US
+Savannah | GA | US
+Charleston | SC | US
+Columbia | SC | US
+Myrtle Beach | SC | US
+Mobile | AL | US
+Pensacola | FL | US
+Gainesville | FL | US
+Sarasota | FL | US
+Naples | FL | US
+Key West | FL | US
+West Palm Beach | FL | US
+Cape Coral | FL | US
+Daytona Beach | FL | US
+Galveston | TX | US
+Shreveport | LA | US
+Lafayette | LA | US
+Jackson | MS | US
+Biloxi | MS | US
+Chattanooga | TN | US
+Asheville | NC | US
+Wilmington | NC | US
+Hartford | CT | US
+New Haven | CT | US
+Albany | NY | US
+Syracuse | NY | US
+Burlington | VT | US
+Portland | ME | US
+Manchester | NH | US
+Wilmington | DE | US
+Allentown | PA | US
+Harrisburg | PA | US
+Akron | OH | US
+Dayton | OH | US
+Ann Arbor | MI | US
+Lansing | MI | US
+Sioux Falls | SD | US
+Fargo | ND | US
+Billings | MT | US
+Cheyenne | WY | US
+Santa Fe | NM | US
+Palm Springs | CA | US
+Santa Barbara | CA | US
+San Luis Obispo | CA | US
+Eugene | OR | US
+Salem | OR | US
+Boulder | CO | US
+Fort Collins | CO | US
+Provo | UT | US
+Hilo | HI | US
+Juneau | AK | US
+
+# --- International: big English-speaking markets and famously humid cities ---
+London | ENG | GB
+Manchester | ENG | GB
+Edinburgh | SCT | GB
+Dublin | L | IE
+Toronto | ON | CA
+Vancouver | BC | CA
+Montréal | QC | CA
+Calgary | AB | CA
+Sydney | NSW | AU
+Melbourne | VIC | AU
+Brisbane | QLD | AU
+Perth | WA | AU
+Darwin | NT | AU
+Auckland | AUK | NZ
+Singapore | 01 | SG
+Central | HCW | HK | Hong Kong
+Mumbai | MH | IN
+Dubai | DU | AE
+Manila | NCR | PH
+Bangkok | 10 | TH
+Kuala Lumpur | 14 | MY
+Lagos | LA | NG
+Johannesburg | GP | ZA
+Rio de Janeiro | RJ | BR
+São Paulo | SP | BR
+Ciudad de México | CMX | MX | Mexico City
+Cancún | ROO | MX
+San Juan | PR | US
+Nassau | NP | BS
+Kingston | 01 | JM
