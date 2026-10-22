@@ -81,6 +81,15 @@ hairforecast.app managed in Route 53. Every component (nginx, the two Flask APIs
 the ingest grid builder) runs as a Docker container, orchestrated with Docker Compose;
 the daily ingest and certificate renewal are systemd timers on the host.
 
+### Component repositories
+
+| Repository | Role |
+|---|---|
+| [hf_ECMWF_ingest](https://github.com/Skyfarer/hf_ECMWF_ingest) | Daily ECMWF GRIB2 download and the `build_grid.py` grid builder, with systemd units. |
+| [hf_weather_api](https://github.com/Skyfarer/hf_weather_api) | Flask forecast API (`/wxapi/*`) that memory-maps the grid file and scores the HFI. |
+| [hf_geoapi](https://github.com/Skyfarer/hf_geoapi) | Flask geolocation API (`/geoapi/*`) for country/city lookup, search and nearest city. |
+| [hairforecast](https://github.com/Skyfarer/hairforecast) | This repo: the React / Vite frontend and the static city-page generator. |
+
 ---
 
 ## License
