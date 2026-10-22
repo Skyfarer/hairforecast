@@ -74,22 +74,14 @@ partial file because the writer renames into place atomically.
                                                      world.sqlite3 (cities/countries)
 ```
 
-### Components
+### Deployment
 
-| Directory | Repo | Description |
-|---|---|---|
-| `forecast-ingest/` | [hf_ECMWF_ingest](https://github.com/Skyfarer/hf_ECMWF_ingest) | Daily ECMWF download + `build_grid.py` grid builder, systemd units. |
-| `hf_weather_api/` | [hf_weather_api](https://github.com/Skyfarer/hf_weather_api) | Flask API: `/wxapi/nearby`, `/forecast`, `/hfi-summary`, `/hfi-detail`. Memory-maps the grid file. |
-| `hf_geoapi/` | [hf_geoapi](https://github.com/Skyfarer/hf_geoapi) | Flask API for country/city lookup, text search and nearest city, backed by SQLite. |
-| `react/hairforecast/` | — | React 19 / Vite frontend and the `city-pages.mjs` SEO generator. |
-| `nginx/` | — | Production (`aws.conf`) and homelab (`walrus.conf`) reverse-proxy configs. |
-| `staging/` | — | Compose files for AWS and homelab deployments, env file. |
-| `grib2dynamo/` | — | The original AWS-era pipeline (Go/Ruby, DynamoDB). Kept for history. |
-| `figma_designs/` | — | UI mockups and logo assets. |
+The production site currently runs on a single Amazon EC2 instance, with DNS for
+hairforecast.app managed in Route 53. Every component (nginx, the two Flask APIs, and
+the ingest grid builder) runs as a Docker container, orchestrated with Docker Compose;
+the daily ingest and certificate renewal are systemd timers on the host.
 
 ---
-
-```
 
 ## License
 
